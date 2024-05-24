@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="spring框架定时任务以前使用过spring boot 框架的定时任务，spring mvc 的配置第一次使用，记录一下 1.配置mvc.xml123456789101112131415&lt;beans  中 添加 xmlns:task&#x3D;&quot;http:&#x2F;&#x2F;www.springframework.org&#x2F;schema&#x2F;task&quot;  xsi:schemaLocation 中添加">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spring框架定时任务">
+<meta property="og:url" content="https://jackiehow.github.io/2020/11/17/spring%E6%A1%86%E6%9E%B6%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/index.html">
+<meta property="og:site_name" content="Jackie&#39;s Blog">
+<meta property="og:description" content="spring框架定时任务以前使用过spring boot 框架的定时任务，spring mvc 的配置第一次使用，记录一下 1.配置mvc.xml123456789101112131415&lt;beans  中 添加 xmlns:task&#x3D;&quot;http:&#x2F;&#x2F;www.springframework.org&#x2F;schema&#x2F;task&quot;  xsi:schemaLocation 中添加">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-11-17T09:56:49.000Z">
+<meta property="article:modified_time" content="2024-05-24T10:33:46.189Z">
+<meta property="article:author" content="Jackie">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>spring框架定时任务</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu" style="display:none;">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="http://github.com/probberechts">项目</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+          <li><a class="icon" aria-label="上一篇" href="/2020/12/03/%E8%BF%9E%E4%B8%8D%E4%B8%8A%E7%BD%91%EF%BC%8C%E7%BF%BB%E8%AF%91%E6%8F%92%E4%BB%B6%E6%8A%A5%E9%94%99/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+          <li><a class="icon" aria-label="下一篇" href="/2020/11/05/ubuntu%E6%90%AD%E5%BB%BArancher%E7%9B%B8%E5%85%B3%E6%93%8D%E4%BD%9C/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://jackiehow.github.io/2020/11/17/spring%E6%A1%86%E6%9E%B6%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://jackiehow.github.io/2020/11/17/spring%E6%A1%86%E6%9E%B6%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/&text=spring框架定时任务"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://jackiehow.github.io/2020/11/17/spring%E6%A1%86%E6%9E%B6%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/&title=spring框架定时任务"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://jackiehow.github.io/2020/11/17/spring%E6%A1%86%E6%9E%B6%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/&is_video=false&description=spring框架定时任务"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=spring框架定时任务&body=Check out this article: https://jackiehow.github.io/2020/11/17/spring%E6%A1%86%E6%9E%B6%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://jackiehow.github.io/2020/11/17/spring%E6%A1%86%E6%9E%B6%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/&title=spring框架定时任务"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://jackiehow.github.io/2020/11/17/spring%E6%A1%86%E6%9E%B6%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/&title=spring框架定时任务"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://jackiehow.github.io/2020/11/17/spring%E6%A1%86%E6%9E%B6%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/&title=spring框架定时任务"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://jackiehow.github.io/2020/11/17/spring%E6%A1%86%E6%9E%B6%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/&title=spring框架定时任务"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://jackiehow.github.io/2020/11/17/spring%E6%A1%86%E6%9E%B6%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/&name=spring框架定时任务&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://jackiehow.github.io/2020/11/17/spring%E6%A1%86%E6%9E%B6%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/&t=spring框架定时任务"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#spring%E6%A1%86%E6%9E%B6%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1"><span class="toc-number">1.</span> <span class="toc-text">spring框架定时任务</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E9%85%8D%E7%BD%AEmvc-xml"><span class="toc-number">1.1.</span> <span class="toc-text">1.配置mvc.xml</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E9%85%8D%E7%BD%AE%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%E7%B1%BB"><span class="toc-number">1.2.</span> <span class="toc-text">2.配置定时任务类</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#crod%E8%A7%84%E5%88%99"><span class="toc-number">1.3.</span> <span class="toc-text">crod规则</span></a></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    var menuVisible = false;
+    var menuIcon = document.getElementById("menu-icon");
+    var menuIconTablet = document.getElementById("menu-icon-tablet");
+    var menu = document.getElementById("menu");
+
+    function toggleMenu() {
+      menuVisible = !menuVisible;
+      menu.style.display = menuVisible ? "block" : "none";
+    }
+
+    menuIcon.addEventListener("click", function(event) {
+      event.preventDefault();
+      toggleMenu();
+    });
+
+    menuIconTablet.addEventListener("click", function(event) {
+      event.preventDefault();
+      toggleMenu();
+    });
+
+    window.addEventListener("scroll", function() {
+      if (menuVisible) {
+        menu.style.display = "block";
+      }
+    });
+  });
+</script>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    <header id="header">
+  <a class="u-url u-uid" href="/">
+  
+    
+      <img id="logo" alt class="u-logo" src="/images/logo.png" />
+    
+  
+    <div id="title">
+      <h1 class="p-name">Jackie&#39;s Blog</h1>
+    </div>
+  </a>
+  <div id="nav">
+    <ul>
+      <li class="icon">
+        <a href="#" aria-label="目录"><i class="fa-solid fa-bars fa-2x"></i></a>
+      </li>
+      <!--
+     --><li><a href="/">首页</a></li><!--
+   --><!--
+     --><li><a href="/about/">关于</a></li><!--
+   --><!--
+     --><li><a href="/archives/">归档</a></li><!--
+   --><!--
+     --><li><a target="_blank" rel="noopener" href="http://github.com/probberechts">项目</a></li><!--
+   -->
+    </ul>
+  </div>
+</header>
+ <!-- 确保包含主 header 部分 -->
+    
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        var header = document.getElementById('header');
+        var headerOffsetTop = header.offsetTop;
+
+        window.addEventListener('scroll', function() {
+          if (window.pageYOffset > headerOffsetTop) {
+            header.classList.add('fixed');
+          } else {
+            header.classList.remove('fixed');
+          }
+        });
+      });
+    </script>
+   <!-- 添加脚本 -->
+    <br/>
+    <br/>
+    <br/>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        spring框架定时任务
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Jackie</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2020-11-17T09:56:49.000Z" class="dt-published" itemprop="datePublished">2020-11-17</time>
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="spring框架定时任务"><a href="#spring框架定时任务" class="headerlink" title="spring框架定时任务"></a>spring框架定时任务</h1><p>以前使用过spring boot 框架的定时任务，spring mvc 的配置第一次使用，记录一下</p>
+<h2 id="1-配置mvc-xml"><a href="#1-配置mvc-xml" class="headerlink" title="1.配置mvc.xml"></a>1.配置mvc.xml</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;beans  中 添加</span><br><span class="line"> xmlns:task=<span class="string">&quot;http://www.springframework.org/schema/task&quot;</span></span><br><span class="line"> </span><br><span class="line"> xsi:schemaLocation 中添加</span><br><span class="line">   http:<span class="comment">//www.springframework.org/schema/task</span></span><br><span class="line">   http:<span class="comment">//www.springframework.org/schema/task/spring-task-4.1.xsd&quot;</span></span><br><span class="line"></span><br><span class="line">    &lt;context:component-scan base-<span class="keyword">package</span>=<span class="string">&quot;com.sipai.websocket&quot;</span>/&gt;</span><br><span class="line"></span><br><span class="line"> &lt;task:annotation-driven/&gt;</span><br><span class="line">    &lt;context:component-scan base-<span class="keyword">package</span>=<span class="string">&quot;com.xxx.schedule&quot;</span>&gt;&lt;/context:component-scan&gt;  <span class="comment">//设置扫描的包路径</span></span><br><span class="line">   </span><br><span class="line">                                                                                                  </span><br><span class="line">                                                                                                  </span><br><span class="line">                                                                                               </span><br></pre></td></tr></table></figure>
+
+<h2 id="2-配置定时任务类"><a href="#2-配置定时任务类" class="headerlink" title="2.配置定时任务类"></a>2.配置定时任务类</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.sipai.schedule;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.sipai.tools.CommUtil;</span><br><span class="line"><span class="keyword">import</span> org.springframework.scheduling.annotation.Scheduled;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Component;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@ClassName</span> : EsSearch</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Description</span> : 定时查询es</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Author</span> : HJQ</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Date</span>: 2020-11-17 16:27</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">EsSearch</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Scheduled(cron = &quot;0 */1 * * * ?&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">sout</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;定时任务 一分钟一次:  &quot;</span> + CommUtil.nowDate());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="crod规则"><a href="#crod规则" class="headerlink" title="crod规则"></a>crod规则</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">  每隔<span class="number">5</span>秒执行一次：*/<span class="number">5</span> * * * * ?</span><br><span class="line"> </span><br><span class="line">             每隔<span class="number">1</span>分钟执行一次：<span class="number">0</span> */<span class="number">1</span> * * * ?</span><br><span class="line"> </span><br><span class="line">             每天<span class="number">23</span>点执行一次：<span class="number">0</span> <span class="number">0</span> <span class="number">23</span> * * ?</span><br><span class="line"> </span><br><span class="line">             每天凌晨<span class="number">1</span>点执行一次：<span class="number">0</span> <span class="number">0</span> <span class="number">1</span> * * ?</span><br><span class="line"> </span><br><span class="line">             每月<span class="number">1</span>号凌晨<span class="number">1</span>点执行一次：<span class="number">0</span> <span class="number">0</span> <span class="number">1</span> <span class="number">1</span> * ?</span><br><span class="line"> </span><br><span class="line">             每月最后一天<span class="number">23</span>点执行一次：<span class="number">0</span> <span class="number">0</span> <span class="number">23</span> L * ?</span><br><span class="line"> </span><br><span class="line">             每周星期天凌晨<span class="number">1</span>点实行一次：<span class="number">0</span> <span class="number">0</span> <span class="number">1</span> ? * L</span><br><span class="line"> </span><br><span class="line">             在<span class="number">26</span>分、<span class="number">29</span>分、<span class="number">33</span>分执行一次：<span class="number">0</span> <span class="number">26</span>,<span class="number">29</span>,<span class="number">33</span> * * * ?</span><br><span class="line"> </span><br><span class="line">             每天的<span class="number">0</span>点、<span class="number">13</span>点、<span class="number">18</span>点、<span class="number">21</span>点都执行一次：<span class="number">0</span> <span class="number">0</span> <span class="number">0</span>,<span class="number">13</span>,<span class="number">18</span>,<span class="number">21</span> * * ?</span><br><span class="line">      </span><br><span class="line">      </span><br><span class="line">      </span><br><span class="line">      </span><br><span class="line"><span class="string">&quot;0 0 12 * * ?&quot;</span>    每天中午十二点触发</span><br><span class="line"><span class="string">&quot;0 15 10 ? * *&quot;</span>    每天早上<span class="number">10</span>：<span class="number">15</span>触发</span><br><span class="line"><span class="string">&quot;0 15 10 * * ?&quot;</span>    每天早上<span class="number">10</span>：<span class="number">15</span>触发</span><br><span class="line"><span class="string">&quot;0 15 10 * * ? *&quot;</span>    每天早上<span class="number">10</span>：<span class="number">15</span>触发</span><br><span class="line"><span class="string">&quot;0 15 10 * * ? 2005&quot;</span>    <span class="number">2005</span>年的每天早上<span class="number">10</span>：<span class="number">15</span>触发</span><br><span class="line"><span class="string">&quot;0 * 14 * * ?&quot;</span>    每天从下午<span class="number">2</span>点开始到<span class="number">2</span>点<span class="number">59</span>分每分钟一次触发</span><br><span class="line"><span class="string">&quot;0 0/5 14 * * ?&quot;</span>    每天从下午<span class="number">2</span>点开始到<span class="number">2</span>：<span class="number">55</span>分结束每<span class="number">5</span>分钟一次触发</span><br><span class="line"><span class="string">&quot;0 0/5 14,18 * * ?&quot;</span>    每天的下午<span class="number">2</span>点至<span class="number">2</span>：<span class="number">55</span>和<span class="number">6</span>点至<span class="number">6</span>点<span class="number">55</span>分两个时间段内每<span class="number">5</span>分钟一次触发</span><br><span class="line"><span class="string">&quot;0 0-5 14 * * ?&quot;</span>    每天<span class="number">14</span>:<span class="number">00</span>至<span class="number">14</span>:<span class="number">05</span>每分钟一次触发</span><br><span class="line"><span class="string">&quot;0 10,44 14 ? 3 WED&quot;</span>    三月的每周三的<span class="number">14</span>：<span class="number">10</span>和<span class="number">14</span>：<span class="number">44</span>触发</span><br><span class="line"><span class="string">&quot;0 15 10 ? * MON-FRI&quot;</span>    每个周一、周二、周三、周四、周五的<span class="number">10</span>：<span class="number">15</span>触发</span><br><span class="line">      </span><br></pre></td></tr></table></figure>
+
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/about/">关于</a></li>
+        
+          <li><a href="/archives/">归档</a></li>
+        
+          <li><a target="_blank" rel="noopener" href="http://github.com/probberechts">项目</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#spring%E6%A1%86%E6%9E%B6%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1"><span class="toc-number">1.</span> <span class="toc-text">spring框架定时任务</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E9%85%8D%E7%BD%AEmvc-xml"><span class="toc-number">1.1.</span> <span class="toc-text">1.配置mvc.xml</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E9%85%8D%E7%BD%AE%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%E7%B1%BB"><span class="toc-number">1.2.</span> <span class="toc-text">2.配置定时任务类</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#crod%E8%A7%84%E5%88%99"><span class="toc-number">1.3.</span> <span class="toc-text">crod规则</span></a></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://jackiehow.github.io/2020/11/17/spring%E6%A1%86%E6%9E%B6%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://jackiehow.github.io/2020/11/17/spring%E6%A1%86%E6%9E%B6%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/&text=spring框架定时任务"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://jackiehow.github.io/2020/11/17/spring%E6%A1%86%E6%9E%B6%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/&title=spring框架定时任务"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://jackiehow.github.io/2020/11/17/spring%E6%A1%86%E6%9E%B6%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/&is_video=false&description=spring框架定时任务"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=spring框架定时任务&body=Check out this article: https://jackiehow.github.io/2020/11/17/spring%E6%A1%86%E6%9E%B6%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://jackiehow.github.io/2020/11/17/spring%E6%A1%86%E6%9E%B6%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/&title=spring框架定时任务"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://jackiehow.github.io/2020/11/17/spring%E6%A1%86%E6%9E%B6%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/&title=spring框架定时任务"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://jackiehow.github.io/2020/11/17/spring%E6%A1%86%E6%9E%B6%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/&title=spring框架定时任务"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://jackiehow.github.io/2020/11/17/spring%E6%A1%86%E6%9E%B6%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/&title=spring框架定时任务"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://jackiehow.github.io/2020/11/17/spring%E6%A1%86%E6%9E%B6%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/&name=spring框架定时任务&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://jackiehow.github.io/2020/11/17/spring%E6%A1%86%E6%9E%B6%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/&t=spring框架定时任务"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2024
+    Jackie
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="http://github.com/probberechts">项目</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

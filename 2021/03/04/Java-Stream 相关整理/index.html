@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="Stream是Java8中处理集合的关键抽象概念，它可以指定你希望对集合进行的操作，可以执行非常复杂的查找、过滤和映射数据等操作。使用Stream API对集合进行操作，就类似与使用SQL执行的数据库操作。也可以使用Stream API来并行执行操作。简而言之，Stream API 提供了一种高效且易于使用的处理数据的方式。  什么是Stream 是数据渠道，用于操作数据源（集合、数组等）所生成">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java Stream 相关整理">
+<meta property="og:url" content="https://jackiehow.github.io/2021/03/04/Java-Stream%20%E7%9B%B8%E5%85%B3%E6%95%B4%E7%90%86/index.html">
+<meta property="og:site_name" content="Jackie&#39;s Blog">
+<meta property="og:description" content="Stream是Java8中处理集合的关键抽象概念，它可以指定你希望对集合进行的操作，可以执行非常复杂的查找、过滤和映射数据等操作。使用Stream API对集合进行操作，就类似与使用SQL执行的数据库操作。也可以使用Stream API来并行执行操作。简而言之，Stream API 提供了一种高效且易于使用的处理数据的方式。  什么是Stream 是数据渠道，用于操作数据源（集合、数组等）所生成">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img2018.cnblogs.com/blog/1070077/201910/1070077-20191026193400193-1772086719.png">
+<meta property="article:published_time" content="2021-03-04T09:33:35.000Z">
+<meta property="article:modified_time" content="2024-05-24T10:33:46.187Z">
+<meta property="article:author" content="Jackie">
+<meta property="article:tag" content="JAVA">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img2018.cnblogs.com/blog/1070077/201910/1070077-20191026193400193-1772086719.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Java Stream 相关整理</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu" style="display:none;">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="http://github.com/probberechts">项目</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+          <li><a class="icon" aria-label="上一篇" href="/2022/10/27/Etcd-%E4%BB%8B%E7%BB%8D/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+          <li><a class="icon" aria-label="下一篇" href="/2021/01/15/List%E4%B8%BA%E6%89%80%E6%9C%89%E5%8F%98%E9%87%8F%E4%B9%8B%E9%97%B4%E6%B7%BB%E5%8A%A0%E5%AD%97%E7%AC%A6/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://jackiehow.github.io/2021/03/04/Java-Stream%20%E7%9B%B8%E5%85%B3%E6%95%B4%E7%90%86/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://jackiehow.github.io/2021/03/04/Java-Stream%20%E7%9B%B8%E5%85%B3%E6%95%B4%E7%90%86/&text=Java Stream 相关整理"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://jackiehow.github.io/2021/03/04/Java-Stream%20%E7%9B%B8%E5%85%B3%E6%95%B4%E7%90%86/&title=Java Stream 相关整理"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://jackiehow.github.io/2021/03/04/Java-Stream%20%E7%9B%B8%E5%85%B3%E6%95%B4%E7%90%86/&is_video=false&description=Java Stream 相关整理"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Java Stream 相关整理&body=Check out this article: https://jackiehow.github.io/2021/03/04/Java-Stream%20%E7%9B%B8%E5%85%B3%E6%95%B4%E7%90%86/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://jackiehow.github.io/2021/03/04/Java-Stream%20%E7%9B%B8%E5%85%B3%E6%95%B4%E7%90%86/&title=Java Stream 相关整理"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://jackiehow.github.io/2021/03/04/Java-Stream%20%E7%9B%B8%E5%85%B3%E6%95%B4%E7%90%86/&title=Java Stream 相关整理"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://jackiehow.github.io/2021/03/04/Java-Stream%20%E7%9B%B8%E5%85%B3%E6%95%B4%E7%90%86/&title=Java Stream 相关整理"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://jackiehow.github.io/2021/03/04/Java-Stream%20%E7%9B%B8%E5%85%B3%E6%95%B4%E7%90%86/&title=Java Stream 相关整理"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://jackiehow.github.io/2021/03/04/Java-Stream%20%E7%9B%B8%E5%85%B3%E6%95%B4%E7%90%86/&name=Java Stream 相关整理&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://jackiehow.github.io/2021/03/04/Java-Stream%20%E7%9B%B8%E5%85%B3%E6%95%B4%E7%90%86/&t=Java Stream 相关整理"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFStream"><span class="toc-number">1.</span> <span class="toc-text">什么是Stream</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%9B%E5%BB%BAStream"><span class="toc-number">2.</span> <span class="toc-text">创建Stream</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%80%9A%E8%BF%87Collection%E7%B3%BB%E5%88%97%E9%9B%86%E5%90%88%E6%8F%90%E4%BE%9B%E7%9A%84stream-%E6%88%96parallelStream"><span class="toc-number">2.0.0.1.</span> <span class="toc-text">通过Collection系列集合提供的stream()或parallelStream()</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%B1%E6%95%B0%E7%BB%84%E5%88%9B%E5%BB%BA%E6%B5%81"><span class="toc-number">2.0.1.</span> <span class="toc-text">由数组创建流</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%B1%E5%80%BC%E5%88%9B%E5%BB%BA%E6%B5%81"><span class="toc-number">2.0.2.</span> <span class="toc-text">由值创建流</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E6%97%A0%E9%99%90%E6%B5%81"><span class="toc-number">2.0.3.</span> <span class="toc-text">创建无限流</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AD%9B%E9%80%89%E4%B8%8E%E5%88%87%E7%89%87"><span class="toc-number">2.0.4.</span> <span class="toc-text">筛选与切片</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%98%A0%E5%B0%84"><span class="toc-number">2.0.5.</span> <span class="toc-text">映射</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8E%92%E5%BA%8F"><span class="toc-number">2.0.6.</span> <span class="toc-text">排序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9F%A5%E6%89%BE%E4%B8%8E%E5%8C%B9%E9%85%8D"><span class="toc-number">2.0.7.</span> <span class="toc-text">查找与匹配</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BD%92%E7%BA%A6"><span class="toc-number">2.0.8.</span> <span class="toc-text">归约</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%94%B6%E9%9B%86"><span class="toc-number">2.0.9.</span> <span class="toc-text">收集</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#toList"><span class="toc-number">2.0.9.1.</span> <span class="toc-text">toList</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#toSet"><span class="toc-number">2.0.9.2.</span> <span class="toc-text">toSet</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#toCollection"><span class="toc-number">2.0.9.3.</span> <span class="toc-text">toCollection</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#counting"><span class="toc-number">2.0.9.4.</span> <span class="toc-text">counting</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#summingInt"><span class="toc-number">2.0.9.5.</span> <span class="toc-text">summingInt</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#averagingInt"><span class="toc-number">2.0.9.6.</span> <span class="toc-text">averagingInt</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#summarizingInt"><span class="toc-number">2.0.9.7.</span> <span class="toc-text">summarizingInt</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#joining"><span class="toc-number">2.0.9.8.</span> <span class="toc-text">joining</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#maxBy"><span class="toc-number">2.0.9.9.</span> <span class="toc-text">maxBy</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#minBy"><span class="toc-number">2.0.9.10.</span> <span class="toc-text">minBy</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#groupingBy"><span class="toc-number">2.0.9.11.</span> <span class="toc-text">groupingBy</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#partitioningBy"><span class="toc-number">2.0.9.12.</span> <span class="toc-text">partitioningBy</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Group-by-Count-And-Sort"><span class="toc-number">3.</span> <span class="toc-text">Group by , Count And Sort</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Group-by-a-List-and-display-the-total-count-of-it"><span class="toc-number">3.1.</span> <span class="toc-text">Group by a List and display the total count of it.</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#output"><span class="toc-number">3.1.0.1.</span> <span class="toc-text">output</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Add-sorting"><span class="toc-number">3.2.</span> <span class="toc-text">Add sorting.</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#output-1"><span class="toc-number">3.2.0.1.</span> <span class="toc-text">output</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#List-Objects"><span class="toc-number">4.</span> <span class="toc-text">List Objects</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#A-Pojo"><span class="toc-number">4.1.</span> <span class="toc-text">A Pojo</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Group-by-the-name-Count-or-Sum-the-Qty"><span class="toc-number">4.2.</span> <span class="toc-text">Group by the name + Count or Sum the Qty.</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#output-2"><span class="toc-number">4.2.0.1.</span> <span class="toc-text">output</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Group-by-Price-%E2%80%93-Collectors-groupingBy-and-Collectors-mapping-example"><span class="toc-number">4.3.</span> <span class="toc-text">Group by Price – Collectors.groupingBy and Collectors.mapping example.</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#output-3"><span class="toc-number">4.3.0.1.</span> <span class="toc-text">output</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BC%95%E7%94%A8%E6%96%87%E7%AB%A0"><span class="toc-number">4.3.0.2.</span> <span class="toc-text">引用文章</span></a></li></ol></li></ol></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    var menuVisible = false;
+    var menuIcon = document.getElementById("menu-icon");
+    var menuIconTablet = document.getElementById("menu-icon-tablet");
+    var menu = document.getElementById("menu");
+
+    function toggleMenu() {
+      menuVisible = !menuVisible;
+      menu.style.display = menuVisible ? "block" : "none";
+    }
+
+    menuIcon.addEventListener("click", function(event) {
+      event.preventDefault();
+      toggleMenu();
+    });
+
+    menuIconTablet.addEventListener("click", function(event) {
+      event.preventDefault();
+      toggleMenu();
+    });
+
+    window.addEventListener("scroll", function() {
+      if (menuVisible) {
+        menu.style.display = "block";
+      }
+    });
+  });
+</script>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    <header id="header">
+  <a class="u-url u-uid" href="/">
+  
+    
+      <img id="logo" alt class="u-logo" src="/images/logo.png" />
+    
+  
+    <div id="title">
+      <h1 class="p-name">Jackie&#39;s Blog</h1>
+    </div>
+  </a>
+  <div id="nav">
+    <ul>
+      <li class="icon">
+        <a href="#" aria-label="目录"><i class="fa-solid fa-bars fa-2x"></i></a>
+      </li>
+      <!--
+     --><li><a href="/">首页</a></li><!--
+   --><!--
+     --><li><a href="/about/">关于</a></li><!--
+   --><!--
+     --><li><a href="/archives/">归档</a></li><!--
+   --><!--
+     --><li><a target="_blank" rel="noopener" href="http://github.com/probberechts">项目</a></li><!--
+   -->
+    </ul>
+  </div>
+</header>
+ <!-- 确保包含主 header 部分 -->
+    
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        var header = document.getElementById('header');
+        var headerOffsetTop = header.offsetTop;
+
+        window.addEventListener('scroll', function() {
+          if (window.pageYOffset > headerOffsetTop) {
+            header.classList.add('fixed');
+          } else {
+            header.classList.remove('fixed');
+          }
+        });
+      });
+    </script>
+   <!-- 添加脚本 -->
+    <br/>
+    <br/>
+    <br/>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        Java Stream 相关整理
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Jackie</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2021-03-04T09:33:35.000Z" class="dt-published" itemprop="datePublished">2021-03-04</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/JAVA/" rel="tag">JAVA</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <blockquote>
+<p>Stream是Java8中处理集合的关键抽象概念，它可以指定你希望对集合进行的操作，可以执行非常复杂的查找、过滤和映射数据等操作。使用Stream API对集合进行操作，就类似与使用SQL执行的数据库操作。也可以使用Stream API来并行执行操作。简而言之，Stream API 提供了一种高效且易于使用的处理数据的方式。</p>
+</blockquote>
+<h1 id="什么是Stream"><a href="#什么是Stream" class="headerlink" title="什么是Stream"></a>什么是Stream</h1><blockquote>
+<p>是数据渠道，用于操作数据源（集合、数组等）所生成的元素序列<br><strong>集合讲的是数据，流讲的是计算</strong></p>
+</blockquote>
+<p><strong>PS：</strong></p>
+<ul>
+<li>Stream自己不会存储元素</li>
+<li>Stream不会改变源对象，相反，他们会返回一个持有结果的新Stream</li>
+<li>Stream操作是延迟执行的，这意味着他们会等到需要结果的时候才执行</li>
+</ul>
+<p>下面的图可以比较直观的反映这一过程：</p>
+<p><img src="https://img2018.cnblogs.com/blog/1070077/201910/1070077-20191026193400193-1772086719.png"></p>
+<ul>
+<li><p>创建Stream<br>一个数据源（数组、集合等），获取一个流</p>
+</li>
+<li><p>中间操作<br>一个中间操作链，对数据源的数据进行处理</p>
+</li>
+<li><p>终止操作（终端操作）<br>一个终止操作，执行中间操作链，并产生结果</p>
+</li>
+</ul>
+<h1 id="创建Stream"><a href="#创建Stream" class="headerlink" title="创建Stream"></a>创建Stream</h1><h4 id="通过Collection系列集合提供的stream-或parallelStream"><a href="#通过Collection系列集合提供的stream-或parallelStream" class="headerlink" title="通过Collection系列集合提供的stream()或parallelStream()"></a>通过Collection系列集合提供的stream()或parallelStream()</h4><blockquote>
+<p>Java8中的Collection接口被扩展，提供了两个获取流的方法：</p>
+<ul>
+<li>default Stream stream()：返回一个顺序流</li>
+<li>default Stream parallelStream()：返回一个并行流</li>
+</ul>
+</blockquote>
+<p>示例代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Integer&gt; list = new ArrayList&lt;&gt;();</span><br><span class="line">Stream&lt;Integer&gt; stream1 = list.stream();</span><br><span class="line">Stream&lt;Integer&gt; stream2 = list.parallelStream();</span><br></pre></td></tr></table></figure>
+
+<h3 id="由数组创建流"><a href="#由数组创建流" class="headerlink" title="由数组创建流"></a>由数组创建流</h3><blockquote>
+<p>Java8的Arrays的静态方法stream()可以获取数据流</p>
+<ul>
+<li>static Stream stream(T[] arrays)：返回一个流</li>
+</ul>
+</blockquote>
+<p>示例代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Integer[] integers = new Integer[10];</span><br><span class="line">Stream&lt;Integer&gt; stream = Arrays.stream(integers);</span><br></pre></td></tr></table></figure>
+
+<h3 id="由值创建流"><a href="#由值创建流" class="headerlink" title="由值创建流"></a>由值创建流</h3><blockquote>
+<p>通过Stream类中的静态方法of()，通过显示值创建一个流，可以接收任意数量的参数</p>
+<ul>
+<li>public static Stream of(T … values)：返回一个流</li>
+</ul>
+</blockquote>
+<p>示例代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Stream&lt;Integer&gt; stream = Stream.of(1, 2, 3);</span><br></pre></td></tr></table></figure>
+
+<h3 id="创建无限流"><a href="#创建无限流" class="headerlink" title="创建无限流"></a>创建无限流</h3><blockquote>
+<p>使用静态方法Stream.iterate()和Stream.generate()，创建无限流</p>
+<ul>
+<li>迭代：public static Stream iterate(final T seed, final UnaryOperator f)</li>
+<li>生成：public static Stream generate(Supplier s)</li>
+</ul>
+</blockquote>
+<p>示例代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// 迭代</span><br><span class="line">Stream stream1 = Stream.iterate(0, (x) -&gt;  x + 2);</span><br><span class="line">// 生成</span><br><span class="line">Stream stream2 = Stream.generate(() -&gt; Math.random());</span><br></pre></td></tr></table></figure>
+
+<p>*<strong>1*</strong>|***2***<strong>中间操作</strong></p>
+<blockquote>
+<p>多个<strong>中间操作</strong>可以连接起来形成一个<strong>流水线</strong>，除非流水线上触发终止操作，否则<strong>中间操作不会执行任何的处理</strong>！而在<strong>终止操作时一次性全部处理，称之为“惰性求值”</strong>。</p>
+</blockquote>
+<h3 id="筛选与切片"><a href="#筛选与切片" class="headerlink" title="筛选与切片"></a>筛选与切片</h3><blockquote>
+<ul>
+<li>filter：结合搜lambda，从流中排除元素</li>
+<li>limit：截断流，使其元素不超过给定数量</li>
+<li>skip(n)：跳过元素，返回一个删除了前n个元素的流；若流中元素不足n个，则返回一个空流；与limit(n)互补</li>
+<li>distinct：筛选，通过流所生成的元素的hashCode()和equals()去除重复元素</li>
+</ul>
+</blockquote>
+<p>示例代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">public class TestStreamApi &#123;</span><br><span class="line">    private static List&lt;Demo&gt; demoList = Arrays.asList(</span><br><span class="line">            new Demo(1, &quot;哈哈哈&quot;),</span><br><span class="line">            new Demo(2, &quot;嘿嘿嘿嘿&quot;),</span><br><span class="line">            new Demo(3, &quot;呵呵呵&quot;),</span><br><span class="line">            new Demo(4, &quot;恩恩恩恩&quot;),</span><br><span class="line">            new Demo(5, &quot;哼哼哼&quot;),</span><br><span class="line">            new Demo(6, &quot;啧啧啧&quot;),</span><br><span class="line">            new Demo(5, &quot;哼哼哼&quot;),</span><br><span class="line">            new Demo(8, &quot;哼&quot;)</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        // 中间操作不会执行任何操作</span><br><span class="line">        Stream&lt;Demo&gt; demoStream = demoList.stream()</span><br><span class="line">                .filter((x) -&gt; x.getRemark().length() == 3)</span><br><span class="line">                .limit(4)</span><br><span class="line">                .skip(1)</span><br><span class="line">                .distinct();</span><br><span class="line"></span><br><span class="line">        // 终止操作一次性执行全部内容</span><br><span class="line">        // 内部迭代：迭代操作由Stream API完成</span><br><span class="line">        demoStream.forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行结果：<br>3-呵呵呵<br>5-哼哼哼<br>6-啧啧啧</p>
+<p><strong>注意：</strong>distinct筛选通过流所生成的元素的hashCode()和equals()去除重复元素，所以需要重写Demo的hashCode()和equals()方法。</p>
+<h3 id="映射"><a href="#映射" class="headerlink" title="映射"></a>映射</h3><blockquote>
+<ul>
+<li>map：接收Lambda，将元素转换成其它形式或提取信息；接收一个函数作为参数，该函数会被应用到每个元素上，并将其映射成一个新的元素</li>
+<li>flatMap：接收一个函数作为参数，将流中的每个值都换成另一个流，然后把所有的流连接成一个流</li>
+</ul>
+</blockquote>
+<p>示例代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">public class TestStreamApi &#123;</span><br><span class="line">    private static List&lt;Demo&gt; demoList = Arrays.asList(</span><br><span class="line">            new Demo(1, &quot;哈哈哈&quot;),</span><br><span class="line">            new Demo(2, &quot;嘿嘿嘿嘿&quot;)</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        demoList.stream()</span><br><span class="line">                .map(Demo::getRemark)</span><br><span class="line">                .flatMap(TestStreamApi :: filterCharacter)</span><br><span class="line">                .forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static Stream&lt;Character&gt; filterCharacter(String str) &#123;</span><br><span class="line">        List&lt;Character&gt; list = new ArrayList&lt;&gt;();</span><br><span class="line">        for (Character c : str.toCharArray()) &#123;</span><br><span class="line">            list.add(c);</span><br><span class="line">        &#125;</span><br><span class="line">        return list.stream();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行结果：<br>哈<br>哈<br>哈<br>嘿<br>嘿<br>嘿<br>嘿</p>
+<h3 id="排序"><a href="#排序" class="headerlink" title="排序"></a>排序</h3><blockquote>
+<ul>
+<li>sorted()：自然排序</li>
+<li>sorted(Comparator c)：定制排序</li>
+</ul>
+</blockquote>
+<p>示例代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">public class TestStreamApi &#123;</span><br><span class="line">    private static List&lt;Demo&gt; demoList = Arrays.asList(</span><br><span class="line">            new Demo(5, &quot;哈哈哈&quot;),</span><br><span class="line">            new Demo(2, &quot;嘿嘿嘿嘿&quot;),</span><br><span class="line">            new Demo(3, &quot;呵呵呵&quot;),</span><br><span class="line">            new Demo(2, &quot;哼哼哼&quot;),</span><br><span class="line">            new Demo(5, &quot;啧啧啧&quot;)</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        List&lt;String&gt; list = Arrays.asList(&quot;aaa&quot;, &quot;bbb&quot;, &quot;ccc&quot;);</span><br><span class="line">        list.stream()</span><br><span class="line">                .sorted()</span><br><span class="line">                .forEach(System.out::println);</span><br><span class="line">        System.out.println(&quot;----------&quot;);</span><br><span class="line">        demoList.stream()</span><br><span class="line">                .sorted((x, y) -&gt; &#123;</span><br><span class="line">                    if (x.getNum().equals(y.getNum())) &#123;</span><br><span class="line">                        return x.getRemark().compareTo(y.getRemark());</span><br><span class="line">                    &#125; else &#123;</span><br><span class="line">                        return x.getNum().compareTo(y.getNum());</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;)</span><br><span class="line">                .forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>*<strong>1*</strong>|***3***<strong>运行结果： aaa bbb ccc</strong></p>
+<p>2-哼哼哼<br>2-嘿嘿嘿嘿<br>3-呵呵呵<br>5-哈哈哈<br>5-啧啧啧</p>
+<p>*<strong>1*</strong>|***4***<strong>终止操作</strong></p>
+<h3 id="查找与匹配"><a href="#查找与匹配" class="headerlink" title="查找与匹配"></a>查找与匹配</h3><blockquote>
+<ul>
+<li>allMatch：检查是否匹配所有元素</li>
+<li>anyMatch：检查是否匹配所有元素</li>
+<li>noneMatch：检查是否没有匹配所有元素</li>
+<li>findFirst：返回第一个元素</li>
+<li>findAny：返回当前流中的任意元素</li>
+<li>count：返回流中元素的总个数</li>
+<li>max：返回流中的最大值</li>
+<li>min：返回流中的最小值</li>
+</ul>
+</blockquote>
+<p>示例代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br></pre></td><td class="code"><pre><span class="line">public class TestStreamApi2 &#123;</span><br><span class="line">        private static List&lt;Demo&gt; demoList = Arrays.asList(</span><br><span class="line">            new Demo(&quot;张三&quot;, 18, 6666.66, Demo.Status.BUSY),</span><br><span class="line">            new Demo(&quot;李四&quot;, 38, 3333.33, Demo.Status.FREE),</span><br><span class="line">            new Demo(&quot;王五&quot;, 28, 5555.55, Demo.Status.FREE),</span><br><span class="line">            new Demo(&quot;赵六&quot;, 48, 7777.77, Demo.Status.BUSY),</span><br><span class="line">            new Demo(&quot;王二麻子&quot;, 58, 8888.88, Demo.Status.VOCATION)</span><br><span class="line"></span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        // 是不是所有的对象都处于BUSY状态</span><br><span class="line">        System.out.println(demoList.stream()</span><br><span class="line">                .allMatch((d) -&gt; d.getStatus().equals(Demo.Status.BUSY)));</span><br><span class="line">        // 是否有对象处于BUSY状态</span><br><span class="line">        System.out.println(demoList.stream()</span><br><span class="line">                .anyMatch((d) -&gt; d.getStatus().equals(Demo.Status.BUSY)));</span><br><span class="line">        // 是否没有对象处于BUSY状态</span><br><span class="line">        System.out.println(demoList.stream()</span><br><span class="line">                .noneMatch((d) -&gt; d.getStatus().equals(Demo.Status.BUSY)));</span><br><span class="line">        // 获取工资最高的</span><br><span class="line">        Optional&lt;Demo&gt; optionalDemo1 = demoList.stream()</span><br><span class="line">                .sorted((x, y) -&gt; -Double.compare(x.getSalary(), y.getSalary()))</span><br><span class="line">                .findFirst();</span><br><span class="line">        System.out.println(optionalDemo1.get());</span><br><span class="line">        // 获取随机一个空闲的</span><br><span class="line">        Optional&lt;Demo&gt; optionalDemo2 = demoList.stream()</span><br><span class="line">                .filter((e) -&gt; e.getStatus().equals(Demo.Status.FREE))</span><br><span class="line">                .findAny();</span><br><span class="line">        System.out.println(optionalDemo2.get());</span><br><span class="line">        // 总数</span><br><span class="line">        System.out.println(demoList.stream().count());</span><br><span class="line">        // 工资最高的</span><br><span class="line">        Optional&lt;Demo&gt; optionalDemo3 = demoList.stream()</span><br><span class="line">                .max((x, y) -&gt; Double.compare(x.getSalary(), y.getSalary()));</span><br><span class="line">        System.out.println(optionalDemo3.get());</span><br><span class="line">        // 最小的工资</span><br><span class="line">        Optional&lt;Double&gt; optionalDemo4 = demoList.stream()</span><br><span class="line">                .map(Demo::getSalary)</span><br><span class="line">                .max(Double::compare);</span><br><span class="line">        System.out.println(optionalDemo4.get());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Demo&#123;</span><br><span class="line">    // 姓名</span><br><span class="line">    String name;</span><br><span class="line">    // 年龄</span><br><span class="line">    Integer age;</span><br><span class="line">    // 工资</span><br><span class="line">    Double salary;</span><br><span class="line">    // 状态</span><br><span class="line">    Status status;</span><br><span class="line"></span><br><span class="line">    public Demo() &#123;&#125;</span><br><span class="line"></span><br><span class="line">    public Demo(String name, Integer age, Double salary, Status status) &#123;</span><br><span class="line">        this.name = name;</span><br><span class="line">        this.age = age;</span><br><span class="line">        this.salary = salary;</span><br><span class="line">        this.status = status;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public String getName() &#123;</span><br><span class="line">        return name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setName(String name) &#123;</span><br><span class="line">        this.name = name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public Integer getAge() &#123;</span><br><span class="line">        return age;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setAge(Integer age) &#123;</span><br><span class="line">        this.age = age;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public Double getSalary() &#123;</span><br><span class="line">        return salary;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setSalary(Double salary) &#123;</span><br><span class="line">        this.salary = salary;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public Status getStatus() &#123;</span><br><span class="line">        return status;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setStatus(Status status) &#123;</span><br><span class="line">        this.status = status;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public boolean equals(Object o) &#123;</span><br><span class="line">        if (this == o) return true;</span><br><span class="line">        if (o == null || getClass() != o.getClass()) return false;</span><br><span class="line">        Demo demo = (Demo) o;</span><br><span class="line">        return name.equals(demo.name) &amp;&amp;</span><br><span class="line">                age.equals(demo.age) &amp;&amp;</span><br><span class="line">                salary.equals(demo.salary) &amp;&amp;</span><br><span class="line">                status == demo.status;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public int hashCode() &#123;</span><br><span class="line">        return Objects.hash(name, age, salary, status);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public String toString() &#123;</span><br><span class="line">        return &quot;Demo&#123;&quot; +</span><br><span class="line">                &quot;name=&#x27;&quot; + name + &#x27;\&#x27;&#x27; +</span><br><span class="line">                &quot;, age=&quot; + age +</span><br><span class="line">                &quot;, salary=&quot; + salary +</span><br><span class="line">                &quot;, status=&quot; + status +</span><br><span class="line">                &#x27;&#125;&#x27;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public enum Status&#123;</span><br><span class="line">        FREE,</span><br><span class="line">        BUSY,</span><br><span class="line">        VOCATION</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行结果：<br>false<br>true<br>false<br>Demo{name&#x3D;’王二麻子’, age&#x3D;58, salary&#x3D;8888.88, status&#x3D;VOCATION}<br>Demo{name&#x3D;’李四’, age&#x3D;38, salary&#x3D;3333.33, status&#x3D;FREE}<br>5<br>Demo{name&#x3D;’王二麻子’, age&#x3D;58, salary&#x3D;8888.88, status&#x3D;VOCATION}<br>8888.88</p>
+<h3 id="归约"><a href="#归约" class="headerlink" title="归约"></a>归约</h3><blockquote>
+<ul>
+<li>reduce(T identify, BinaryOperator) &#x2F; reduce(BinaryOperator)：可以将流中元素反复结合起来，得到一个值</li>
+</ul>
+</blockquote>
+<p>示例代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">public class TestStreamApi3 &#123;</span><br><span class="line">    private static List&lt;Demo&gt; demoList = Arrays.asList(</span><br><span class="line">            new Demo(&quot;张三&quot;, 18, 6666.66, Demo.Status.BUSY),</span><br><span class="line">            new Demo(&quot;李四&quot;, 38, 3333.33, Demo.Status.FREE),</span><br><span class="line">            new Demo(&quot;王五&quot;, 28, 5555.55, Demo.Status.FREE),</span><br><span class="line">            new Demo(&quot;赵六&quot;, 48, 7777.77, Demo.Status.BUSY),</span><br><span class="line">            new Demo(&quot;王二麻子&quot;, 58, 8888.88, Demo.Status.VOCATION)</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Optional&lt;Double&gt; optional = demoList.stream()</span><br><span class="line">                .map(Demo::getSalary)</span><br><span class="line">                .reduce(Double::sum);</span><br><span class="line">        System.out.println(optional.get());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行结果：<br>32222.190000000002</p>
+<h3 id="收集"><a href="#收集" class="headerlink" title="收集"></a>收集</h3><blockquote>
+<ul>
+<li>collect：将流转换为其他形式。接收一个Collection接口的实现，用于给Stream中元素做汇总的方法</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>Collectors接口中方法的实现决定了如何对流执行收集操作（如搜集到List、Set、Map）。</p>
+<ul>
+<li>toList：把流中元素收集到List</li>
+<li>toSet：把流中元素收集到Set</li>
+<li>toCollection：把流中元素收集到创建的集合</li>
+<li>counting：计算流中元素的个数</li>
+<li>summingInt：对流中元素的整数属性求和</li>
+<li>averagingInt：计算流中元素Integer属性的平均值</li>
+<li>summarizingInt：收集流中Integer属性的统计值</li>
+<li>jioning：连接流中的每个字符串</li>
+<li>maxBy：根据比较器选择最大值</li>
+<li>minBy：根据比较器选择最小值</li>
+<li>reducing：从一个作为累加器的初始值开始，利用BinaryOperator与流中元素逐个结合，从而规约成单个值</li>
+<li>collectingAndThen：包裹另一个收集器，对其结果转换函数</li>
+<li>groupingBy：根据某个属性值对流分组，属性为K，结果为V</li>
+<li>partitioningBy：根据true、false进行分区</li>
+</ul>
+</blockquote>
+<p>给定一个数组，方便测试：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">private static List&lt;Demo&gt; demoList = Arrays.asList(</span><br><span class="line">        new Demo(&quot;张三&quot;, 18, 6666.66, Demo.Status.BUSY),</span><br><span class="line">        new Demo(&quot;李四&quot;, 38, 3333.33, Demo.Status.FREE),</span><br><span class="line">        new Demo(&quot;王五&quot;, 28, 5555.55, Demo.Status.FREE),</span><br><span class="line">        new Demo(&quot;赵六&quot;, 48, 7777.77, Demo.Status.BUSY),</span><br><span class="line">        new Demo(&quot;王二麻子&quot;, 58, 8888.88, Demo.Status.VOCATION)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<h4 id="toList"><a href="#toList" class="headerlink" title="toList"></a>toList</h4><p>示例代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// 收集 - toList</span><br><span class="line">System.out.println(&quot;----------------&gt;toList&quot;);</span><br><span class="line">List&lt;String&gt; list = demoList.stream()</span><br><span class="line">            .map(Demo::getName)</span><br><span class="line">            .collect(Collectors.toList());</span><br><span class="line">list.forEach(System.out::println);</span><br></pre></td></tr></table></figure>
+
+<p>运行结果：<br>张三<br>李四<br>王五<br>赵六<br>王二麻子</p>
+<h4 id="toSet"><a href="#toSet" class="headerlink" title="toSet"></a>toSet</h4><p>示例代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// 收集 - toSet</span><br><span class="line">System.out.println(&quot;----------------&gt;toSet&quot;);</span><br><span class="line">Set&lt;String&gt; set = demoList.stream()</span><br><span class="line">        .map(Demo::getName)</span><br><span class="line">        .collect(Collectors.toSet());</span><br><span class="line">set.forEach(System.out::println);</span><br></pre></td></tr></table></figure>
+
+<p>运行结果：<br>李四<br>张三<br>王二麻子<br>王五<br>赵六</p>
+<h4 id="toCollection"><a href="#toCollection" class="headerlink" title="toCollection"></a>toCollection</h4><p>示例代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// 收集 - toCollection</span><br><span class="line">System.out.println(&quot;----------------&gt;toCollection&quot;);</span><br><span class="line">HashSet&lt;String&gt; hashSet = demoList.stream()</span><br><span class="line">        .map(Demo::getName)</span><br><span class="line">        .collect(Collectors.toCollection(HashSet::new));</span><br><span class="line">hashSet.forEach(System.out::println);</span><br></pre></td></tr></table></figure>
+
+<p>运行结果：<br>李四<br>张三<br>王二麻子<br>王五<br>赵六</p>
+<h4 id="counting"><a href="#counting" class="headerlink" title="counting"></a>counting</h4><p>示例代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// 收集 - counting 计算总数</span><br><span class="line">System.out.println(&quot;----------------&gt;counting&quot;);</span><br><span class="line">System.out.println(demoList.stream()</span><br><span class="line">        .collect(Collectors.counting()));</span><br></pre></td></tr></table></figure>
+
+<p>运行结果：<br>5</p>
+<h4 id="summingInt"><a href="#summingInt" class="headerlink" title="summingInt"></a>summingInt</h4><p>示例代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// 收集 - summingInt 计算年龄总和</span><br><span class="line">System.out.println(&quot;----------------&gt;summingInt&quot;);</span><br><span class="line">System.out.println(demoList.stream()</span><br><span class="line">        .collect(Collectors.summingInt(Demo::getAge)));</span><br></pre></td></tr></table></figure>
+
+<p>运行结果：<br>190</p>
+<h4 id="averagingInt"><a href="#averagingInt" class="headerlink" title="averagingInt"></a>averagingInt</h4><p>示例代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// 收集 - averagingInt 平均年龄</span><br><span class="line">System.out.println(&quot;----------------&gt;averagingInt&quot;);</span><br><span class="line">System.out.println(demoList.stream()</span><br><span class="line">        .collect(Collectors.averagingInt(Demo::getAge)));</span><br></pre></td></tr></table></figure>
+
+<p>运行结果：<br>38.0</p>
+<h4 id="summarizingInt"><a href="#summarizingInt" class="headerlink" title="summarizingInt"></a>summarizingInt</h4><p>示例代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">// 收集 - summarizingInt</span><br><span class="line">System.out.println(&quot;----------------&gt;summarizingInt&quot;);</span><br><span class="line">IntSummaryStatistics summaryStatistics = demoList.stream()</span><br><span class="line">        .collect(Collectors.summarizingInt(Demo::getAge));</span><br><span class="line">// 最大值</span><br><span class="line">System.out.println(summaryStatistics.getMax());</span><br><span class="line">// 平均值</span><br><span class="line">System.out.println(summaryStatistics.getAverage());</span><br><span class="line">// 总和</span><br><span class="line">System.out.println(summaryStatistics.getSum());</span><br></pre></td></tr></table></figure>
+
+<p>运行结果：<br>58<br>38.0<br>190</p>
+<h4 id="joining"><a href="#joining" class="headerlink" title="joining"></a>joining</h4><p>示例代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// 收集 - joining 连接姓名</span><br><span class="line">System.out.println(&quot;----------------&gt;joining&quot;);</span><br><span class="line">String s = demoList.stream()</span><br><span class="line">        .map(Demo::getName)</span><br><span class="line">        .collect(Collectors.joining(&quot;,&quot;, &quot;开始-&gt;&quot;, &quot;&lt;-结束&quot;));</span><br><span class="line">System.out.println(s);</span><br></pre></td></tr></table></figure>
+
+<p>运行结果：<br>开始-&gt;张三,李四,王五,赵六,王二麻子&lt;-结束</p>
+<h4 id="maxBy"><a href="#maxBy" class="headerlink" title="maxBy"></a>maxBy</h4><p>示例代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 收集 - maxBy 获取工资最高的人</span><br><span class="line">System.out.println(&quot;----------------&gt;maxBy&quot;);</span><br><span class="line">Optional&lt;Demo&gt; max = demoList.stream()</span><br><span class="line">        .collect(Collectors.maxBy((x, y) -&gt; Double.compare(x.getSalary(), y.getSalary())));</span><br><span class="line">System.out.println(max.get());</span><br></pre></td></tr></table></figure>
+
+<p>运行结果：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Demo&#123;name=<span class="string">&#x27;王二麻子&#x27;</span>, age=<span class="number">58</span>, salary=<span class="number">8888.88</span>, status=VOCATION&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="minBy"><a href="#minBy" class="headerlink" title="minBy"></a>minBy</h4><p>示例代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// 收集 - minBy 获取最低的</span><br><span class="line">System.out.println(&quot;----------------&gt;minBy&quot;);</span><br><span class="line">Optional&lt;Double&gt; min = demoList.stream()</span><br><span class="line">        .map(Demo::getSalary)</span><br><span class="line">        .collect(Collectors.minBy(Double::compare));</span><br><span class="line">System.out.println(min.get());</span><br></pre></td></tr></table></figure>
+
+<p>运行结果：<br>3333.33</p>
+<h4 id="groupingBy"><a href="#groupingBy" class="headerlink" title="groupingBy"></a>groupingBy</h4><p>示例代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">// 收集 - groupingBy 根据状态分组</span><br><span class="line">System.out.println(&quot;----------------&gt;groupingBy&quot;);</span><br><span class="line">Map&lt;Demo.Status, List&lt;Demo&gt;&gt; group = demoList.stream()</span><br><span class="line">        .collect(Collectors.groupingBy(Demo::getStatus));</span><br><span class="line">System.out.println(group);</span><br><span class="line">// 多级分组 先按状态分组,在按年龄分组</span><br><span class="line">Map&lt;Demo.Status, Map&lt;String, List&lt;Demo&gt;&gt;&gt; group2 = demoList.stream()</span><br><span class="line">        .collect(Collectors.groupingBy(Demo::getStatus, Collectors.groupingBy((x) -&gt; &#123;</span><br><span class="line">            if (x.getAge() &lt;= 30) &#123;</span><br><span class="line">                return &quot;青年&quot;;</span><br><span class="line">            &#125; else if (x.getAge() &lt;= 45) &#123;</span><br><span class="line">                return &quot;中年&quot;;</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                return &quot;老年&quot;;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;)));</span><br><span class="line">System.out.println(group2);</span><br></pre></td></tr></table></figure>
+
+<p>运行结果：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">	VOCATION = [Demo &#123;</span><br><span class="line">		name = <span class="string">&#x27;王二麻子&#x27;</span>, age = <span class="number">58</span>, salary = <span class="number">8888.88</span>, status = VOCATION</span><br><span class="line">	&#125;], </span><br><span class="line">    </span><br><span class="line">    FREE = [Demo &#123;</span><br><span class="line">		name = <span class="string">&#x27;李四&#x27;</span>, age = <span class="number">38</span>, salary = <span class="number">3333.33</span>, status = FREE</span><br><span class="line">	&#125;, Demo &#123;</span><br><span class="line">		name = <span class="string">&#x27;王五&#x27;</span>, age = <span class="number">28</span>, salary = <span class="number">5555.55</span>, status = FREE</span><br><span class="line">	&#125;], </span><br><span class="line">    </span><br><span class="line">    BUSY = [Demo &#123;</span><br><span class="line">		name = <span class="string">&#x27;张三&#x27;</span>, age = <span class="number">18</span>, salary = <span class="number">6666.66</span>, status = BUSY</span><br><span class="line">	&#125;, Demo &#123;</span><br><span class="line">		name = <span class="string">&#x27;赵六&#x27;</span>, age = <span class="number">48</span>, salary = <span class="number">7777.77</span>, status = BUSY</span><br><span class="line">	&#125;]</span><br><span class="line">&#125; &#123;</span><br><span class="line">	VOCATION = &#123;</span><br><span class="line">		老年 = [Demo &#123;</span><br><span class="line">			name = <span class="string">&#x27;王二麻子&#x27;</span>, age = <span class="number">58</span>, salary = <span class="number">8888.88</span>, status = VOCATION</span><br><span class="line">		&#125;]</span><br><span class="line">	&#125;, </span><br><span class="line">    </span><br><span class="line">    FREE = &#123;</span><br><span class="line">		青年 = [Demo &#123;</span><br><span class="line">			name = <span class="string">&#x27;王五&#x27;</span>, age = <span class="number">28</span>, salary = <span class="number">5555.55</span>, status = FREE</span><br><span class="line">		&#125;],</span><br><span class="line">		中年 = [Demo &#123;</span><br><span class="line">			name = <span class="string">&#x27;李四&#x27;</span>, age = <span class="number">38</span>, salary = <span class="number">3333.33</span>, status = FREE</span><br><span class="line">		&#125;]</span><br><span class="line">	&#125;, </span><br><span class="line">    </span><br><span class="line">    BUSY = &#123;</span><br><span class="line">		青年 = [Demo &#123;</span><br><span class="line">			name = <span class="string">&#x27;张三&#x27;</span>, age = <span class="number">18</span>, salary = <span class="number">6666.66</span>, status = BUSY</span><br><span class="line">		&#125;],</span><br><span class="line">		老年 = [Demo &#123;</span><br><span class="line">			name = <span class="string">&#x27;赵六&#x27;</span>, age = <span class="number">48</span>, salary = <span class="number">7777.77</span>, status = BUSY</span><br><span class="line">		&#125;]</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="partitioningBy"><a href="#partitioningBy" class="headerlink" title="partitioningBy"></a>partitioningBy</h4><p>示例代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 收集 - partitioningBy 分区</span><br><span class="line">System.out.println(&quot;----------------&gt;partitioningBy&quot;);</span><br><span class="line">Map&lt;Boolean, List&lt;Demo&gt;&gt; partition = demoList.stream()</span><br><span class="line">        .collect(Collectors.partitioningBy((x) -&gt; x.getAge() &gt; 30));</span><br><span class="line">System.out.println(partition);</span><br></pre></td></tr></table></figure>
+
+<p>运行结果：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">	<span class="literal">false</span> = [Demo &#123;</span><br><span class="line">		name = <span class="string">&#x27;张三&#x27;</span>, age = <span class="number">18</span>, salary = <span class="number">6666.66</span>, status = BUSY</span><br><span class="line">	&#125;, Demo &#123;</span><br><span class="line">		name = <span class="string">&#x27;王五&#x27;</span>, age = <span class="number">28</span>, salary = <span class="number">5555.55</span>, status = FREE</span><br><span class="line">	&#125;], </span><br><span class="line">    </span><br><span class="line">    <span class="literal">true</span> = [Demo &#123;</span><br><span class="line">		name = <span class="string">&#x27;李四&#x27;</span>, age = <span class="number">38</span>, salary = <span class="number">3333.33</span>, status = FREE</span><br><span class="line">	&#125;, Demo &#123;</span><br><span class="line">		name = <span class="string">&#x27;赵六&#x27;</span>, age = <span class="number">48</span>, salary = <span class="number">7777.77</span>, status = BUSY</span><br><span class="line">	&#125;, Demo &#123;</span><br><span class="line">		name = <span class="string">&#x27;王二麻子&#x27;</span>, age = <span class="number">58</span>, salary = <span class="number">8888.88</span>, status = VOCATION</span><br><span class="line">	&#125;]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<blockquote>
+<p>Group By 相关操作以及例子</p>
+</blockquote>
+<h1 id="Group-by-Count-And-Sort"><a href="#Group-by-Count-And-Sort" class="headerlink" title="Group by , Count And Sort"></a>Group by , Count And Sort</h1><h2 id="Group-by-a-List-and-display-the-total-count-of-it"><a href="#Group-by-a-List-and-display-the-total-count-of-it" class="headerlink" title="Group by a List and display the total count of it."></a>Group by a List and display the total count of it.</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.mkyong.java8;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Arrays;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"><span class="keyword">import</span> java.util.function.Function;</span><br><span class="line"><span class="keyword">import</span> java.util.stream.Collectors;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Java8Example1</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//3 apple, 2 banana, others 1</span></span><br><span class="line">        List&lt;String&gt; items =</span><br><span class="line">                Arrays.asList(<span class="string">&quot;apple&quot;</span>, <span class="string">&quot;apple&quot;</span>, <span class="string">&quot;banana&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;apple&quot;</span>, <span class="string">&quot;orange&quot;</span>, <span class="string">&quot;banana&quot;</span>, <span class="string">&quot;papaya&quot;</span>);</span><br><span class="line"></span><br><span class="line">        Map&lt;String, Long&gt; result =</span><br><span class="line">                items.stream().collect(</span><br><span class="line">                        Collectors.groupingBy(</span><br><span class="line">                                Function.identity(), Collectors.counting()</span><br><span class="line">                        )</span><br><span class="line">                );</span><br><span class="line"></span><br><span class="line">        System.out.println(result);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="output"><a href="#output" class="headerlink" title="output"></a>output</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    papaya=<span class="number">1</span>, orange=<span class="number">1</span>, banana=<span class="number">2</span>, apple=<span class="number">3</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Add-sorting"><a href="#Add-sorting" class="headerlink" title="Add sorting."></a>Add sorting.</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.mkyong.java8;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Arrays;</span><br><span class="line"><span class="keyword">import</span> java.util.LinkedHashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"><span class="keyword">import</span> java.util.function.Function;</span><br><span class="line"><span class="keyword">import</span> java.util.stream.Collectors;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Java8Example2</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//3 apple, 2 banana, others 1</span></span><br><span class="line">        List&lt;String&gt; items =</span><br><span class="line">                Arrays.asList(<span class="string">&quot;apple&quot;</span>, <span class="string">&quot;apple&quot;</span>, <span class="string">&quot;banana&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;apple&quot;</span>, <span class="string">&quot;orange&quot;</span>, <span class="string">&quot;banana&quot;</span>, <span class="string">&quot;papaya&quot;</span>);</span><br><span class="line"></span><br><span class="line">        Map&lt;String, Long&gt; result =</span><br><span class="line">                items.stream().collect(</span><br><span class="line">                        Collectors.groupingBy(</span><br><span class="line">                                Function.identity(), Collectors.counting()</span><br><span class="line">                        )</span><br><span class="line">                );</span><br><span class="line"></span><br><span class="line">        Map&lt;String, Long&gt; finalMap = <span class="keyword">new</span> <span class="title class_">LinkedHashMap</span>&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        <span class="comment">//Sort a map and add to finalMap</span></span><br><span class="line">        result.entrySet().stream()</span><br><span class="line">                .sorted(Map.Entry.&lt;String, Long&gt;comparingByValue()</span><br><span class="line">                        .reversed()).forEachOrdered(e -&gt; finalMap.put(e.getKey(), e.getValue()));</span><br><span class="line"></span><br><span class="line">        System.out.println(finalMap);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="output-1"><a href="#output-1" class="headerlink" title="output"></a>output</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    apple=<span class="number">3</span>, banana=<span class="number">2</span>, papaya=<span class="number">1</span>, orange=<span class="number">1</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="List-Objects"><a href="#List-Objects" class="headerlink" title="List Objects"></a>List Objects</h1><p>Examples to ‘group by’ a list of user defined Objects.</p>
+<h2 id="A-Pojo"><a href="#A-Pojo" class="headerlink" title="A Pojo"></a>A Pojo</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.mkyong.java8;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.math.BigDecimal;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Item</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> qty;</span><br><span class="line">    <span class="keyword">private</span> BigDecimal price;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//constructors, getter/setters</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Group-by-the-name-Count-or-Sum-the-Qty"><a href="#Group-by-the-name-Count-or-Sum-the-Qty" class="headerlink" title="Group by the name + Count or Sum the Qty."></a>Group by the name + Count or Sum the Qty.</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.mkyong.java8;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.math.BigDecimal;</span><br><span class="line"><span class="keyword">import</span> java.util.Arrays;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"><span class="keyword">import</span> java.util.stream.Collectors;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Java8Examples3</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//3 apple, 2 banana, others 1</span></span><br><span class="line">        List&lt;Item&gt; items = Arrays.asList(</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">Item</span>(<span class="string">&quot;apple&quot;</span>, <span class="number">10</span>, <span class="keyword">new</span> <span class="title class_">BigDecimal</span>(<span class="string">&quot;9.99&quot;</span>)),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">Item</span>(<span class="string">&quot;banana&quot;</span>, <span class="number">20</span>, <span class="keyword">new</span> <span class="title class_">BigDecimal</span>(<span class="string">&quot;19.99&quot;</span>)),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">Item</span>(<span class="string">&quot;orang&quot;</span>, <span class="number">10</span>, <span class="keyword">new</span> <span class="title class_">BigDecimal</span>(<span class="string">&quot;29.99&quot;</span>)),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">Item</span>(<span class="string">&quot;watermelon&quot;</span>, <span class="number">10</span>, <span class="keyword">new</span> <span class="title class_">BigDecimal</span>(<span class="string">&quot;29.99&quot;</span>)),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">Item</span>(<span class="string">&quot;papaya&quot;</span>, <span class="number">20</span>, <span class="keyword">new</span> <span class="title class_">BigDecimal</span>(<span class="string">&quot;9.99&quot;</span>)),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">Item</span>(<span class="string">&quot;apple&quot;</span>, <span class="number">10</span>, <span class="keyword">new</span> <span class="title class_">BigDecimal</span>(<span class="string">&quot;9.99&quot;</span>)),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">Item</span>(<span class="string">&quot;banana&quot;</span>, <span class="number">10</span>, <span class="keyword">new</span> <span class="title class_">BigDecimal</span>(<span class="string">&quot;19.99&quot;</span>)),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">Item</span>(<span class="string">&quot;apple&quot;</span>, <span class="number">20</span>, <span class="keyword">new</span> <span class="title class_">BigDecimal</span>(<span class="string">&quot;9.99&quot;</span>))</span><br><span class="line">        );</span><br><span class="line"></span><br><span class="line">        Map&lt;String, Long&gt; counting = items.stream().collect(</span><br><span class="line">                Collectors.groupingBy(Item::getName, Collectors.counting()));</span><br><span class="line"></span><br><span class="line">        System.out.println(counting);</span><br><span class="line"></span><br><span class="line">        Map&lt;String, Integer&gt; sum = items.stream().collect(</span><br><span class="line">                Collectors.groupingBy(Item::getName, Collectors.summingInt(Item::getQty)));</span><br><span class="line"></span><br><span class="line">        System.out.println(sum);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="output-2"><a href="#output-2" class="headerlink" title="output"></a>output</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Group by + Count</span></span><br><span class="line">&#123;</span><br><span class="line">    papaya=<span class="number">1</span>, banana=<span class="number">2</span>, apple=<span class="number">3</span>, orang=<span class="number">1</span>, watermelon=<span class="number">1</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//Group by + Sum qty</span></span><br><span class="line">&#123;</span><br><span class="line">    papaya=<span class="number">20</span>, banana=<span class="number">30</span>, apple=<span class="number">40</span>, orang=<span class="number">10</span>, watermelon=<span class="number">10</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Group-by-Price-–-Collectors-groupingBy-and-Collectors-mapping-example"><a href="#Group-by-Price-–-Collectors-groupingBy-and-Collectors-mapping-example" class="headerlink" title="Group by Price – Collectors.groupingBy and Collectors.mapping example."></a>Group by Price – Collectors.groupingBy and Collectors.mapping example.</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.mkyong.java8;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.math.BigDecimal;</span><br><span class="line"><span class="keyword">import</span> java.util.Arrays;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"><span class="keyword">import</span> java.util.Set;</span><br><span class="line"><span class="keyword">import</span> java.util.stream.Collectors;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Java8Examples4</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//3 apple, 2 banana, others 1</span></span><br><span class="line">        List&lt;Item&gt; items = Arrays.asList(</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">Item</span>(<span class="string">&quot;apple&quot;</span>, <span class="number">10</span>, <span class="keyword">new</span> <span class="title class_">BigDecimal</span>(<span class="string">&quot;9.99&quot;</span>)),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">Item</span>(<span class="string">&quot;banana&quot;</span>, <span class="number">20</span>, <span class="keyword">new</span> <span class="title class_">BigDecimal</span>(<span class="string">&quot;19.99&quot;</span>)),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">Item</span>(<span class="string">&quot;orang&quot;</span>, <span class="number">10</span>, <span class="keyword">new</span> <span class="title class_">BigDecimal</span>(<span class="string">&quot;29.99&quot;</span>)),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">Item</span>(<span class="string">&quot;watermelon&quot;</span>, <span class="number">10</span>, <span class="keyword">new</span> <span class="title class_">BigDecimal</span>(<span class="string">&quot;29.99&quot;</span>)),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">Item</span>(<span class="string">&quot;papaya&quot;</span>, <span class="number">20</span>, <span class="keyword">new</span> <span class="title class_">BigDecimal</span>(<span class="string">&quot;9.99&quot;</span>)),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">Item</span>(<span class="string">&quot;apple&quot;</span>, <span class="number">10</span>, <span class="keyword">new</span> <span class="title class_">BigDecimal</span>(<span class="string">&quot;9.99&quot;</span>)),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">Item</span>(<span class="string">&quot;banana&quot;</span>, <span class="number">10</span>, <span class="keyword">new</span> <span class="title class_">BigDecimal</span>(<span class="string">&quot;19.99&quot;</span>)),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">Item</span>(<span class="string">&quot;apple&quot;</span>, <span class="number">20</span>, <span class="keyword">new</span> <span class="title class_">BigDecimal</span>(<span class="string">&quot;9.99&quot;</span>))</span><br><span class="line">                );</span><br><span class="line"></span><br><span class="line">        <span class="comment">//group by price</span></span><br><span class="line">        Map&lt;BigDecimal, List&lt;Item&gt;&gt; groupByPriceMap =</span><br><span class="line">            items.stream().collect(Collectors.groupingBy(Item::getPrice));</span><br><span class="line"></span><br><span class="line">        System.out.println(groupByPriceMap);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// group by price, uses &#x27;mapping&#x27; to convert List&lt;Item&gt; to Set&lt;String&gt;</span></span><br><span class="line">        Map&lt;BigDecimal, Set&lt;String&gt;&gt; result =</span><br><span class="line">                items.stream().collect(</span><br><span class="line">                        Collectors.groupingBy(Item::getPrice,</span><br><span class="line">                                Collectors.mapping(Item::getName, Collectors.toSet())</span><br><span class="line">                        )</span><br><span class="line">                );</span><br><span class="line"></span><br><span class="line">        System.out.println(result);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="output-3"><a href="#output-3" class="headerlink" title="output"></a>output</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="number">19.99</span>=[</span><br><span class="line">            Item&#123;name=<span class="string">&#x27;banana&#x27;</span>, qty=<span class="number">20</span>, price=<span class="number">19.99</span>&#125;, </span><br><span class="line">            Item&#123;name=<span class="string">&#x27;banana&#x27;</span>, qty=<span class="number">10</span>, price=<span class="number">19.99</span>&#125;</span><br><span class="line">        ], </span><br><span class="line">    <span class="number">29.99</span>=[</span><br><span class="line">            Item&#123;name=<span class="string">&#x27;orang&#x27;</span>, qty=<span class="number">10</span>, price=<span class="number">29.99</span>&#125;, </span><br><span class="line">            Item&#123;name=<span class="string">&#x27;watermelon&#x27;</span>, qty=<span class="number">10</span>, price=<span class="number">29.99</span>&#125;</span><br><span class="line">        ], </span><br><span class="line">    <span class="number">9.99</span>=[</span><br><span class="line">            Item&#123;name=<span class="string">&#x27;apple&#x27;</span>, qty=<span class="number">10</span>, price=<span class="number">9.99</span>&#125;, </span><br><span class="line">            Item&#123;name=<span class="string">&#x27;papaya&#x27;</span>, qty=<span class="number">20</span>, price=<span class="number">9.99</span>&#125;, </span><br><span class="line">            Item&#123;name=<span class="string">&#x27;apple&#x27;</span>, qty=<span class="number">10</span>, price=<span class="number">9.99</span>&#125;, </span><br><span class="line">            Item&#123;name=<span class="string">&#x27;apple&#x27;</span>, qty=<span class="number">20</span>, price=<span class="number">9.99</span>&#125;</span><br><span class="line">        ]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//group by + mapping to Set</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="number">19.99</span>=[banana], </span><br><span class="line">    <span class="number">29.99</span>=[orang, watermelon], </span><br><span class="line">    <span class="number">9.99</span>=[papaya, apple]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>GroupBy</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;Integer, Integer&gt; totalNoThings = somethings.stream()</span><br><span class="line">    .collect(Collectors.groupingBy(Something::getParentKey,</span><br><span class="line">        Collectors.summingInt(Something::getNoThings)));</span><br></pre></td></tr></table></figure>
+
+<p>二次排序</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Something&gt; sorted=somethings.stream().sorted(</span><br><span class="line">    Comparator.comparing((Something x)-&gt;totalNoThings.get(x.getParentKey()))</span><br><span class="line">          .thenComparing(Something::getNoThings).reversed())</span><br><span class="line">    .collect(Collectors.toList());</span><br></pre></td></tr></table></figure>
+
+<p>通过多个条件分组</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;List&lt;String&gt;, Integer&gt; map = </span><br><span class="line">    myList.stream()</span><br><span class="line">          .collect(Collectors.groupingBy(</span><br><span class="line">             f -&gt; Arrays.asList(f.getType(), f.getCode()),</span><br><span class="line">             Collectors.summingInt(Foo::getQuantity)</span><br><span class="line">          ));</span><br><span class="line"></span><br><span class="line">List&lt;Foo&gt; result = </span><br><span class="line">    map.entrySet()</span><br><span class="line">       .stream()</span><br><span class="line">       .map(e -&gt; <span class="keyword">new</span> <span class="title class_">Foo</span>(e.getKey().get(<span class="number">0</span>), e.getValue(), e.getKey().get(<span class="number">1</span>)))</span><br><span class="line">       .collect(Collectors.toList());</span><br></pre></td></tr></table></figure>
+
+
+
+<p>高级写法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Foo&gt; result = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;(</span><br><span class="line">    myList.stream()</span><br><span class="line">          .collect(Collectors.groupingBy(</span><br><span class="line">              f -&gt; Arrays.&lt;String&gt;asList(f.getType(), f.getCode()),</span><br><span class="line">              MoreCollectors.pairing(</span><br><span class="line">                 Collectors.collectingAndThen(MoreCollectors.first(), Optional::get),</span><br><span class="line">                 Collectors.summingInt(Foo::getQuantity),</span><br><span class="line">                 (f, s) -&gt; <span class="keyword">new</span> <span class="title class_">Foo</span>(f.getType(), s, f.getCode())</span><br><span class="line">              )</span><br><span class="line">          )).values());</span><br></pre></td></tr></table></figure>
+
+
+
+<p>Compute sum of salaries by department</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;Department, Integer&gt; totalByDept</span><br><span class="line">= employees.stream()</span><br><span class="line">.collect(Collectors.groupingBy(Employee::getDepartment,</span><br><span class="line">Collectors.summingInt(Employee::getSalary)));</span><br></pre></td></tr></table></figure>
+
+
+
+
+<blockquote>
+<h4 id="引用文章"><a href="#引用文章" class="headerlink" title="引用文章"></a>引用文章</h4><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/fx-blog/p/11745205.html">https://www.cnblogs.com/fx-blog/p/11745205.html</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/frankenjoy123/article/details/70739800">https://blog.csdn.net/frankenjoy123/article/details/70739800</a></p>
+</blockquote>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/about/">关于</a></li>
+        
+          <li><a href="/archives/">归档</a></li>
+        
+          <li><a target="_blank" rel="noopener" href="http://github.com/probberechts">项目</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFStream"><span class="toc-number">1.</span> <span class="toc-text">什么是Stream</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%9B%E5%BB%BAStream"><span class="toc-number">2.</span> <span class="toc-text">创建Stream</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%80%9A%E8%BF%87Collection%E7%B3%BB%E5%88%97%E9%9B%86%E5%90%88%E6%8F%90%E4%BE%9B%E7%9A%84stream-%E6%88%96parallelStream"><span class="toc-number">2.0.0.1.</span> <span class="toc-text">通过Collection系列集合提供的stream()或parallelStream()</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%B1%E6%95%B0%E7%BB%84%E5%88%9B%E5%BB%BA%E6%B5%81"><span class="toc-number">2.0.1.</span> <span class="toc-text">由数组创建流</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%B1%E5%80%BC%E5%88%9B%E5%BB%BA%E6%B5%81"><span class="toc-number">2.0.2.</span> <span class="toc-text">由值创建流</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E6%97%A0%E9%99%90%E6%B5%81"><span class="toc-number">2.0.3.</span> <span class="toc-text">创建无限流</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AD%9B%E9%80%89%E4%B8%8E%E5%88%87%E7%89%87"><span class="toc-number">2.0.4.</span> <span class="toc-text">筛选与切片</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%98%A0%E5%B0%84"><span class="toc-number">2.0.5.</span> <span class="toc-text">映射</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8E%92%E5%BA%8F"><span class="toc-number">2.0.6.</span> <span class="toc-text">排序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9F%A5%E6%89%BE%E4%B8%8E%E5%8C%B9%E9%85%8D"><span class="toc-number">2.0.7.</span> <span class="toc-text">查找与匹配</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BD%92%E7%BA%A6"><span class="toc-number">2.0.8.</span> <span class="toc-text">归约</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%94%B6%E9%9B%86"><span class="toc-number">2.0.9.</span> <span class="toc-text">收集</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#toList"><span class="toc-number">2.0.9.1.</span> <span class="toc-text">toList</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#toSet"><span class="toc-number">2.0.9.2.</span> <span class="toc-text">toSet</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#toCollection"><span class="toc-number">2.0.9.3.</span> <span class="toc-text">toCollection</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#counting"><span class="toc-number">2.0.9.4.</span> <span class="toc-text">counting</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#summingInt"><span class="toc-number">2.0.9.5.</span> <span class="toc-text">summingInt</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#averagingInt"><span class="toc-number">2.0.9.6.</span> <span class="toc-text">averagingInt</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#summarizingInt"><span class="toc-number">2.0.9.7.</span> <span class="toc-text">summarizingInt</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#joining"><span class="toc-number">2.0.9.8.</span> <span class="toc-text">joining</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#maxBy"><span class="toc-number">2.0.9.9.</span> <span class="toc-text">maxBy</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#minBy"><span class="toc-number">2.0.9.10.</span> <span class="toc-text">minBy</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#groupingBy"><span class="toc-number">2.0.9.11.</span> <span class="toc-text">groupingBy</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#partitioningBy"><span class="toc-number">2.0.9.12.</span> <span class="toc-text">partitioningBy</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Group-by-Count-And-Sort"><span class="toc-number">3.</span> <span class="toc-text">Group by , Count And Sort</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Group-by-a-List-and-display-the-total-count-of-it"><span class="toc-number">3.1.</span> <span class="toc-text">Group by a List and display the total count of it.</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#output"><span class="toc-number">3.1.0.1.</span> <span class="toc-text">output</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Add-sorting"><span class="toc-number">3.2.</span> <span class="toc-text">Add sorting.</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#output-1"><span class="toc-number">3.2.0.1.</span> <span class="toc-text">output</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#List-Objects"><span class="toc-number">4.</span> <span class="toc-text">List Objects</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#A-Pojo"><span class="toc-number">4.1.</span> <span class="toc-text">A Pojo</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Group-by-the-name-Count-or-Sum-the-Qty"><span class="toc-number">4.2.</span> <span class="toc-text">Group by the name + Count or Sum the Qty.</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#output-2"><span class="toc-number">4.2.0.1.</span> <span class="toc-text">output</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Group-by-Price-%E2%80%93-Collectors-groupingBy-and-Collectors-mapping-example"><span class="toc-number">4.3.</span> <span class="toc-text">Group by Price – Collectors.groupingBy and Collectors.mapping example.</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#output-3"><span class="toc-number">4.3.0.1.</span> <span class="toc-text">output</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BC%95%E7%94%A8%E6%96%87%E7%AB%A0"><span class="toc-number">4.3.0.2.</span> <span class="toc-text">引用文章</span></a></li></ol></li></ol></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://jackiehow.github.io/2021/03/04/Java-Stream%20%E7%9B%B8%E5%85%B3%E6%95%B4%E7%90%86/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://jackiehow.github.io/2021/03/04/Java-Stream%20%E7%9B%B8%E5%85%B3%E6%95%B4%E7%90%86/&text=Java Stream 相关整理"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://jackiehow.github.io/2021/03/04/Java-Stream%20%E7%9B%B8%E5%85%B3%E6%95%B4%E7%90%86/&title=Java Stream 相关整理"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://jackiehow.github.io/2021/03/04/Java-Stream%20%E7%9B%B8%E5%85%B3%E6%95%B4%E7%90%86/&is_video=false&description=Java Stream 相关整理"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Java Stream 相关整理&body=Check out this article: https://jackiehow.github.io/2021/03/04/Java-Stream%20%E7%9B%B8%E5%85%B3%E6%95%B4%E7%90%86/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://jackiehow.github.io/2021/03/04/Java-Stream%20%E7%9B%B8%E5%85%B3%E6%95%B4%E7%90%86/&title=Java Stream 相关整理"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://jackiehow.github.io/2021/03/04/Java-Stream%20%E7%9B%B8%E5%85%B3%E6%95%B4%E7%90%86/&title=Java Stream 相关整理"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://jackiehow.github.io/2021/03/04/Java-Stream%20%E7%9B%B8%E5%85%B3%E6%95%B4%E7%90%86/&title=Java Stream 相关整理"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://jackiehow.github.io/2021/03/04/Java-Stream%20%E7%9B%B8%E5%85%B3%E6%95%B4%E7%90%86/&title=Java Stream 相关整理"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://jackiehow.github.io/2021/03/04/Java-Stream%20%E7%9B%B8%E5%85%B3%E6%95%B4%E7%90%86/&name=Java Stream 相关整理&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://jackiehow.github.io/2021/03/04/Java-Stream%20%E7%9B%B8%E5%85%B3%E6%95%B4%E7%90%86/&t=Java Stream 相关整理"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2024
+    Jackie
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="http://github.com/probberechts">项目</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

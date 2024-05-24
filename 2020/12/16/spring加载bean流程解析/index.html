@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="spring作为目前我们开发的基础框架,每天的开发工作基本和他形影不离,作为管理bean的最经典、优秀的框架，它的复杂程度往往令人望而却步。不过作为朝夕相处的框架，我们必须得明白一个问题就是spring是如何加载bean的，我们常在开发中使用的注解比如@Component、@AutoWired、@Socpe等注解，Spring是如何解析的，明白这些原理将有助于我们更深刻的理解spring。需要说明">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spring加载bean流程解析">
+<meta property="og:url" content="https://jackiehow.github.io/2020/12/16/spring%E5%8A%A0%E8%BD%BDbean%E6%B5%81%E7%A8%8B%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:site_name" content="Jackie&#39;s Blog">
+<meta property="og:description" content="spring作为目前我们开发的基础框架,每天的开发工作基本和他形影不离,作为管理bean的最经典、优秀的框架，它的复杂程度往往令人望而却步。不过作为朝夕相处的框架，我们必须得明白一个问题就是spring是如何加载bean的，我们常在开发中使用的注解比如@Component、@AutoWired、@Socpe等注解，Spring是如何解析的，明白这些原理将有助于我们更深刻的理解spring。需要说明">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pic.rmb.bdstatic.com/bjh/6d502c9b0df56085b4762f52899f9a7f.png">
+<meta property="og:image" content="https://pic.rmb.bdstatic.com/bjh/a88df10984dd4d891d5cd5cb491ff0e3.png">
+<meta property="og:image" content="https://pic.rmb.bdstatic.com/bjh/86bd0abc2cb40e217d4a99a1ecc36908.png">
+<meta property="og:image" content="https://pic.rmb.bdstatic.com/bjh/f26d8baadfc953e75293acaef15fd112.png">
+<meta property="og:image" content="https://pic.rmb.bdstatic.com/bjh/75e7800c9e9be22afba7244a8ee00f3f.png">
+<meta property="og:image" content="https://img2018.cnblogs.com/blog/1066538/201909/1066538-20190902144643308-976203883.png">
+<meta property="og:image" content="https://img2018.cnblogs.com/blog/1066538/201909/1066538-20190902144811252-370424296.png">
+<meta property="og:image" content="https://pic.rmb.bdstatic.com/bjh/135ff1a530d04988c1da18108d02d5e8.png">
+<meta property="og:image" content="https://pic.rmb.bdstatic.com/bjh/db54dd24a261c2bb77841ef56c881b9a.png">
+<meta property="og:image" content="https://pic.rmb.bdstatic.com/bjh/781dbde6b7572f79f83be7399b93c4a0.png">
+<meta property="article:published_time" content="2020-12-16T02:50:53.000Z">
+<meta property="article:modified_time" content="2024-05-24T10:33:46.189Z">
+<meta property="article:author" content="Jackie">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pic.rmb.bdstatic.com/bjh/6d502c9b0df56085b4762f52899f9a7f.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>spring加载bean流程解析</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu" style="display:none;">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="http://github.com/probberechts">项目</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+          <li><a class="icon" aria-label="上一篇" href="/2020/12/23/List%E5%AE%9E%E4%BD%93%E6%A0%B9%E6%8D%AE%E5%88%AB%E7%9A%84List%E5%85%B3%E9%94%AE%E5%AD%97%E8%BF%9B%E8%A1%8C%E5%88%86%E7%BB%84/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+          <li><a class="icon" aria-label="下一篇" href="/2020/12/15/%E4%BD%BF%E7%94%A8%E6%9C%AC%E5%9C%B0JAR%E5%8C%85/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://jackiehow.github.io/2020/12/16/spring%E5%8A%A0%E8%BD%BDbean%E6%B5%81%E7%A8%8B%E8%A7%A3%E6%9E%90/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://jackiehow.github.io/2020/12/16/spring%E5%8A%A0%E8%BD%BDbean%E6%B5%81%E7%A8%8B%E8%A7%A3%E6%9E%90/&text=spring加载bean流程解析"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://jackiehow.github.io/2020/12/16/spring%E5%8A%A0%E8%BD%BDbean%E6%B5%81%E7%A8%8B%E8%A7%A3%E6%9E%90/&title=spring加载bean流程解析"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://jackiehow.github.io/2020/12/16/spring%E5%8A%A0%E8%BD%BDbean%E6%B5%81%E7%A8%8B%E8%A7%A3%E6%9E%90/&is_video=false&description=spring加载bean流程解析"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=spring加载bean流程解析&body=Check out this article: https://jackiehow.github.io/2020/12/16/spring%E5%8A%A0%E8%BD%BDbean%E6%B5%81%E7%A8%8B%E8%A7%A3%E6%9E%90/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://jackiehow.github.io/2020/12/16/spring%E5%8A%A0%E8%BD%BDbean%E6%B5%81%E7%A8%8B%E8%A7%A3%E6%9E%90/&title=spring加载bean流程解析"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://jackiehow.github.io/2020/12/16/spring%E5%8A%A0%E8%BD%BDbean%E6%B5%81%E7%A8%8B%E8%A7%A3%E6%9E%90/&title=spring加载bean流程解析"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://jackiehow.github.io/2020/12/16/spring%E5%8A%A0%E8%BD%BDbean%E6%B5%81%E7%A8%8B%E8%A7%A3%E6%9E%90/&title=spring加载bean流程解析"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://jackiehow.github.io/2020/12/16/spring%E5%8A%A0%E8%BD%BDbean%E6%B5%81%E7%A8%8B%E8%A7%A3%E6%9E%90/&title=spring加载bean流程解析"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://jackiehow.github.io/2020/12/16/spring%E5%8A%A0%E8%BD%BDbean%E6%B5%81%E7%A8%8B%E8%A7%A3%E6%9E%90/&name=spring加载bean流程解析&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://jackiehow.github.io/2020/12/16/spring%E5%8A%A0%E8%BD%BDbean%E6%B5%81%E7%A8%8B%E8%A7%A3%E6%9E%90/&t=spring加载bean流程解析"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+  </span>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    var menuVisible = false;
+    var menuIcon = document.getElementById("menu-icon");
+    var menuIconTablet = document.getElementById("menu-icon-tablet");
+    var menu = document.getElementById("menu");
+
+    function toggleMenu() {
+      menuVisible = !menuVisible;
+      menu.style.display = menuVisible ? "block" : "none";
+    }
+
+    menuIcon.addEventListener("click", function(event) {
+      event.preventDefault();
+      toggleMenu();
+    });
+
+    menuIconTablet.addEventListener("click", function(event) {
+      event.preventDefault();
+      toggleMenu();
+    });
+
+    window.addEventListener("scroll", function() {
+      if (menuVisible) {
+        menu.style.display = "block";
+      }
+    });
+  });
+</script>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    <header id="header">
+  <a class="u-url u-uid" href="/">
+  
+    
+      <img id="logo" alt class="u-logo" src="/images/logo.png" />
+    
+  
+    <div id="title">
+      <h1 class="p-name">Jackie&#39;s Blog</h1>
+    </div>
+  </a>
+  <div id="nav">
+    <ul>
+      <li class="icon">
+        <a href="#" aria-label="目录"><i class="fa-solid fa-bars fa-2x"></i></a>
+      </li>
+      <!--
+     --><li><a href="/">首页</a></li><!--
+   --><!--
+     --><li><a href="/about/">关于</a></li><!--
+   --><!--
+     --><li><a href="/archives/">归档</a></li><!--
+   --><!--
+     --><li><a target="_blank" rel="noopener" href="http://github.com/probberechts">项目</a></li><!--
+   -->
+    </ul>
+  </div>
+</header>
+ <!-- 确保包含主 header 部分 -->
+    
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        var header = document.getElementById('header');
+        var headerOffsetTop = header.offsetTop;
+
+        window.addEventListener('scroll', function() {
+          if (window.pageYOffset > headerOffsetTop) {
+            header.classList.add('fixed');
+          } else {
+            header.classList.remove('fixed');
+          }
+        });
+      });
+    </script>
+   <!-- 添加脚本 -->
+    <br/>
+    <br/>
+    <br/>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        spring加载bean流程解析
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Jackie</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2020-12-16T02:50:53.000Z" class="dt-published" itemprop="datePublished">2020-12-16</time>
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>spring作为目前我们开发的基础框架,每天的开发工作基本和他形影不离,作为管理bean的最经典、优秀的框架，它的复杂程度往往令人望而却步。不过作为朝夕相处的框架，我们必须得明白一个问题就是spring是如何加载bean的，我们常在开发中使用的注解比如@Component、@AutoWired、@Socpe等注解，Spring是如何解析的，明白这些原理将有助于我们更深刻的理解spring。需要说明一点的是spring的源码非常精密、复杂，限于篇幅的关系，本篇博客不会细致的分析源码，<strong>会采取抽丝剥茧的方式，避轻就重，抓住重点来分析整个流程(不会分析具体的细节)，本次将会基于spring5.0的版本</strong></p>
+<p>本篇博客的目录：</p>
+<p><strong>一：spring读取配置或注解的过程</strong></p>
+<p><strong>二：spring的bean的生命周期</strong></p>
+<p><strong>三：spring的BeanPostProcessor处理器</strong></p>
+<p><strong>四：一些关键性的问题</strong></p>
+<p><strong>五：测试</strong></p>
+<p><strong>六：总结</strong> </p>
+<p><strong>一：spring读取配置或注解的过程</strong> </p>
+<p>1：先通过扫描指定包路径下的spring注解，比如@Component、@Service、@Lazy @Sope等spring识别的注解或者是xml配置的属性(通过读取流,解析成Document，Document)然后spring会解析这些属性，将这些属性封装到BeanDefintaion这个接口的实现类中.</p>
+<p><img src="https://pic.rmb.bdstatic.com/bjh/6d502c9b0df56085b4762f52899f9a7f.png" alt="image.png"></p>
+<p>在springboot中，我们也可以采用注解配置的方式：</p>
+<p><img src="https://pic.rmb.bdstatic.com/bjh/a88df10984dd4d891d5cd5cb491ff0e3.png" alt="image.png"></p>
+<p><img src="https://pic.rmb.bdstatic.com/bjh/86bd0abc2cb40e217d4a99a1ecc36908.png" alt="image.png"></p>
+<p>比如这个配置Bean,spring也会将className、scope、lazy等这些属性装配到PersonAction对应的BeanDefintaion中.具体采用的是BeanDefinitionParser接口中的parse(Element element, ParserContext parserContext)方法,该接口有很多不同的实现类。通过实现类去解析注解或者xml然后放到BeanDefination中,BeanDefintaion的作用是集成了我们的配置对象中的各种属性，重要的有这个bean的ClassName，还有是否是Singleton、对象的属性和值等（如果是单例的话，后面会将这个单例对象放入到spring的单例池中）。spring后期如果需要这些属性就会直接从它中获取。然后，再注册到一个ConcurrentHashMap中，在spring中具体的方法就是registerBeanDefinition()，这个Map存的key是对象的名字，比如Person这个对象，它的名字就是person,值是BeanDefination,它位于DefaultListableBeanFactory类下面的beanDefinitionMap类属性中，同时将所有的bean的名字放入到beanDefinitionNames这个list中,目的就是方便取beanName;</p>
+<p><strong>二：spring的bean的生命周期</strong></p>
+<p>spring的bean生命周期其实最核心的分为4个步骤，只要理清三个关键的步骤，其他的只是在这三个细节中添加不同的细节实现,也就是spring的bean生明周期：</p>
+<p><strong>实例化和初始化的区别</strong>：实例化是在jvm的堆中创建了这个对象实例，此时它只是一个空的对象，所有的属性为null。而初始化的过程就是讲对象依赖的一些属性进行赋值之后，调用某些方法来开启一些默认加载。比如spring中配置的数据库属性Bean，在初始化的时候就会将这些属性填充，比如driver、jdbcurl等,然后初始化连接</p>
+<p><strong>2.1：实例化</strong> Instantiation</p>
+<p>   AbstractAutowireCapableBeanFactory.doCreateBean中会调用createBeanInstance()方法,该阶段主要是从beanDefinitionMap循环读取bean,获取它的属性，然后利用反射(core包下有ReflectionUtil会先强行将构造方法setAccessible(true))读取对象的构造方法(spring会自动判断是否是有参数还是无参数，以及构造方法中的参数是否可用),然后再去创建实例（newInstance）</p>
+<p><strong>2.2：</strong><em><strong>*初始化*</strong></em></p>
+<p>  初始化主要包括两个步骤,一个是属性填充，另一个就是具体的初始化过程</p>
+<p><strong>2.2.1：属性赋值</strong> PopulateBean()会对bean的依赖属性进行填充，@AutoWired注解注入的属性就发生这个阶段，假如我们的bean有很多依赖的对象，那么spring会依次调用这些依赖的对象进行实例化，注意这里可能会有循环依赖的问题。后面我们会讲到spring是如何解决循环依赖的问题</p>
+<p><strong>2.2.2：初始化</strong> Initialization</p>
+<p>​    初始化的过程包括将初始化好的bean放入到spring的缓存中、填充我们预设的属性进一步做后置处理等<br><strong>3: 使用和销毁</strong> Destruction</p>
+<p>   在Spring将所有的bean都初始化好之后，我们的业务系统就可以调用了。而销毁主要的操作是销毁bean，主要是伴随着spring容器的关闭，此时会将spring的bean移除容器之中。此后spring的生命周期到这一步彻底结束，不再接受spring的管理和约束。</p>
+<p><strong>三：spring的BeanPostProcessor处理器</strong></p>
+<p>spring的另一个强大之处就是允许开发者自定义扩展bean的初始化过程，最主要的实现思路就是通过BeanPostProcessor来实现的,spring有各种前置和后置处理器，这些处理器渗透在bean创建的前前后后,穿插在spring生命周期的各个阶段，每一步都会影响着spring的bean加载过程。接下来我们就来分析具体的过程：</p>
+<p><img src="https://pic.rmb.bdstatic.com/bjh/f26d8baadfc953e75293acaef15fd112.png" alt="image.png"></p>
+<p> <strong>3.1:实例化阶段</strong></p>
+<p>该阶段会调用对象的空构造方法进行对象的实例化，在进行实例化之后，会调用InstantiationAwareBeanPostProcessor的postProcessBeforeInstantiation方法</p>
+<p><strong>BeanPostProcessor(具体实现是InstantiationAwareBeanPostProcessor). postProcessBeforeInstantiation();</strong></p>
+<p>这个阶段允许在Bena进行实例化之前，允许开发者自定义逻辑，如返回一个代理对象。不过需要注意的是假如在这个阶段返回了一个不为null的实例，spring就会中断后续的过程。<br>BeanPostProcessor.postProcessAfterInstantiation();</p>
+<p>这个阶段是Bean实例化完毕后执行的后处理操作，所有在初始化逻辑、装配逻辑之前执行</p>
+<p>3.2:<strong>初始化阶段</strong></p>
+<p>3.2.1:BeanPostProcessor.postProcessBeforeInitialization</p>
+<p>该方法在bean初始化方法前被调用，Spring AOP的底层处理也是通过实现BeanPostProcessor来执行代理逻辑的</p>
+<p>3.2.2:InitializingBean.afterPropertiesSet</p>
+<p>自定义属性值 该方法允许我们进行对对象中的属性进行设置，假如在某些业务中，一个对象的某些属性为null,但是不能显示为null，比如显示0或者其他的固定数值，我们就可以在这个方法实现中将null值转换为特定的值</p>
+<p>3.2.3:BeanPostProcessor.postProcessAfterInitialization(Object bean, String beanName)。可以在这个方法中进行bean的实例化之后的处理，比如我们的自定义注解，对依赖对象的版本控制自动路由切换。比如有一个服务依赖了两种版本的实现，我们如何实现自动切换呢？这时候可以自定义一个路由注解,假如叫@RouteAnnotaion，然后实现BeanPostProcessor接口，在其中通过反射拿到自定义的注解@RouteAnnotaion再进行路由规则的设定。</p>
+<p><img src="https://pic.rmb.bdstatic.com/bjh/75e7800c9e9be22afba7244a8ee00f3f.png" alt="image.png"><br>3.2.4:SmartInitializingSingleton.afterSingletonsInstantiated</p>
+<p><strong>4.1：容器启动运行阶段</strong></p>
+<p>4.1.1:SmartLifecycle.start</p>
+<p><strong>容器正式渲染完毕，开始启动阶段,bean已经在spring容器的管理下,程序可以随时调用</strong></p>
+<p><strong>5.1：容器停止销毁</strong><br>5.1.1:SmartLifecycle.stop(Runnable callback) </p>
+<p>spring容器停止运行<br>5.1.2:DisposableBean.destroy()</p>
+<p>spring会将所有的bean销毁,实现的bean实例被销毁的时候释放资源被调用</p>
+<p><strong>四：一些关键性的问题</strong></p>
+<p><strong>4.1:FactoryBean和BeanFactory的区别？</strong></p>
+<p><img src="https://img2018.cnblogs.com/blog/1066538/201909/1066538-20190902144643308-976203883.png" alt="img"></p>
+<p>BeanFactory是个bean 工厂类接口，是负责生产和管理bean的工厂，是IOC容器最底层和基础的接口，spring用它来管理和装配普通bean的IOC容器,它有多种实现，比如AnnotationConfigApplicationContext、XmlWebApplicationContext等。</p>
+<p><img src="https://img2018.cnblogs.com/blog/1066538/201909/1066538-20190902144811252-370424296.png" alt="img"></p>
+<p>FactoryBean是FactoryBean属于spring的一个bean，在IOC容器的基础上给Bean的实现加上了一个简单工厂模式和装饰模式，是一个可以生产对象和装饰对象的工厂bean，由spring管理，生产的对象是由getObject()方法决定的。注意：它是泛型的，只能固定生产某一类对象，而不像BeanFactory那样可以生产多种类型的Bean。在对于某些特殊的Bean的处理中，比如Bean本身就是一个工厂，那么在其进行单独的实例化操作逻辑中，可能我们并不想走spring的那一套逻辑，此时就可以实现FactoryBean接口自己控制逻辑。</p>
+<p><strong>4.2：spring如何解决循环依赖问题</strong></p>
+<p>循环依赖问题就是A-&gt;B-&gt;A，spring在创建A的时候,发现需要依赖B,因为去创建B实例,发现B又依赖于A,又去创建A,因为形成一个闭环，无法停止下来就可能会导致cpu计算飙升</p>
+<p>如何解决这个问题呢？spring解决这个问题主要靠巧妙的三层缓存，所谓的缓存主要是指这三个map,<strong>singletonObjects主要存放的是单例对象，属于第一级缓存；</strong>singletonFactories属于单例工厂对象，属于第三级缓存；earlySingletonObjects属于第二级缓存，如何理解early这个标识呢？它表示只是经过了实例化尚未初始化的对象。Spring首先从singletonObjects（一级缓存）中尝试获取，如果获取不到并且对象在创建中，则尝试从earlySingletonObjects(二级缓存)中获取，如果还是获取不到并且允许从singletonFactories通过getObject获取，则通过singletonFactory.getObject()(三级缓存)获取。如果获取到了则移除对应的singletonFactory,将singletonObject放入到earlySingletonObjects，其实就是将三级缓存提升到二级缓存,这个就是缓存升级。spring在进行对象创建的时候，会依次从一级、二级、三级缓存中寻找对象，如果找到直接返回。由于是初次创建，只能从第三级缓存中找到(实例化阶段放入进去的)，创建完实例，然后将缓存放到第一级缓存中。下次循环依赖的再直接从一级缓存中就可以拿到实例对象了。</p>
+<p><img src="https://pic.rmb.bdstatic.com/bjh/135ff1a530d04988c1da18108d02d5e8.png" alt="image.png"></p>
+<p> <strong><img src="https://pic.rmb.bdstatic.com/bjh/db54dd24a261c2bb77841ef56c881b9a.png" alt="image.png"></strong></p>
+<p><strong>五：测试</strong></p>
+<p>我们来写一个测试类，验证一下上面的问题：</p>
+<p>5.1:首先声明一个自定义的Bean</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">@Component</span><br><span class="line">public class CustomBean &#123;</span><br><span class="line">    public CustomBean()&#123;</span><br><span class="line">        System.out.println(&quot;调用CustomBean空的构造方法&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>5.2:声明一个Bean来实现BeanPostProcessor</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line">package com.wyq.spring.bean;</span><br><span class="line"></span><br><span class="line">import org.springframework.beans.BeansException;</span><br><span class="line">import org.springframework.beans.PropertyValues;</span><br><span class="line">import org.springframework.beans.factory.DisposableBean;</span><br><span class="line">import org.springframework.beans.factory.SmartInitializingSingleton;</span><br><span class="line">import org.springframework.beans.factory.config.BeanPostProcessor;</span><br><span class="line">import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor;</span><br><span class="line">import org.springframework.context.annotation.Scope;</span><br><span class="line">import org.springframework.stereotype.Component;</span><br><span class="line"></span><br><span class="line">import java.beans.PropertyDescriptor;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * @Author: wyq</span><br><span class="line"> * @Desc:</span><br><span class="line"> * @Date: 2019/9/1 15:36</span><br><span class="line"> **/</span><br><span class="line">@Component</span><br><span class="line">@Scope(&quot;singleton&quot;)</span><br><span class="line">public class TestBean implements BeanPostProcessor, SmartInitializingSingleton, InstantiationAwareBeanPostProcessor, DisposableBean&#123;</span><br><span class="line"></span><br><span class="line">    private static final String BEAN_NAME= &quot;customBean&quot;;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException &#123;</span><br><span class="line">        if (BEAN_NAME.equals(beanName)) &#123;</span><br><span class="line">            System.out.println(&quot;==&gt;BeanPostProcessor.postProcessBeforeInitialization&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        return null;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException &#123;</span><br><span class="line">        if (BEAN_NAME.equals(beanName)) &#123;</span><br><span class="line">            System.out.println(&quot;==&gt;BeanPostProcessor.postProcessAfterInitialization&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        return null;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void afterSingletonsInstantiated() &#123;</span><br><span class="line">        System.out.println(&quot;==&gt;SmartInitializingSingleton.afterSingletonsInstantiated&quot;);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public Object postProcessBeforeInstantiation(Class&lt;?&gt; beanClass, String beanName) throws BeansException &#123;</span><br><span class="line">        if (BEAN_NAME.equals(beanName)) &#123;</span><br><span class="line">            System.out.println(&quot;==&gt;InstantiationAwareBeanPostProcessor.postProcessBeforeInstantiation&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        return null;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public boolean postProcessAfterInstantiation(Object bean, String beanName) throws BeansException &#123;</span><br><span class="line">        if (BEAN_NAME.equals(beanName)) &#123;</span><br><span class="line">            System.out.println(&quot;==&gt;InstantiationAwareBeanPostProcessor.postProcessAfterInstantiation&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        return false;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public PropertyValues postProcessPropertyValues(PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName) throws BeansException &#123;</span><br><span class="line">        System.out.println(&quot;==&gt;InstantiationAwareBeanPostProcessor.postProcessPropertyValues&quot;);</span><br><span class="line">        return null;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void destroy() throws Exception &#123;</span><br><span class="line">        System.out.println(&quot;==&gt;DisposableBean.destroy&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>5.3:启动容器：</p>
+<p><img src="https://pic.rmb.bdstatic.com/bjh/781dbde6b7572f79f83be7399b93c4a0.png" alt="image.png"></p>
+<p><strong>六：总结</strong></p>
+<p>   本篇博客主要是介绍了Spring的一些实例化的过程，高屋建瓴的分析了一下spring的bean加载过程，没有详细展开某个细节分析。spring的内部源码非常复杂，每个接口的实现类都在5个以上，如果深入细节，恐怕不是一篇博客能讲清楚的。这篇博客的目的就是在阐述spring的基本脉络中心路线顺序,首先我们需要有一个总体的认识，然后再深入到细节就是轻而易举的了。这也是一种学习的方法论，通过本篇博客我希望能梳理清楚spring的基本流程，对spring有一个比较清晰的认识。并且学习到优秀开源框架的设计基本思想，还有就是进一步提升自己的阅读源码的能力。</p>
+<p>原文链接  <a target="_blank" rel="noopener" href="https://www.cnblogs.com/wyq178/p/11415877.html">https://www.cnblogs.com/wyq178/p/11415877.html</a></p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/about/">关于</a></li>
+        
+          <li><a href="/archives/">归档</a></li>
+        
+          <li><a target="_blank" rel="noopener" href="http://github.com/probberechts">项目</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://jackiehow.github.io/2020/12/16/spring%E5%8A%A0%E8%BD%BDbean%E6%B5%81%E7%A8%8B%E8%A7%A3%E6%9E%90/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://jackiehow.github.io/2020/12/16/spring%E5%8A%A0%E8%BD%BDbean%E6%B5%81%E7%A8%8B%E8%A7%A3%E6%9E%90/&text=spring加载bean流程解析"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://jackiehow.github.io/2020/12/16/spring%E5%8A%A0%E8%BD%BDbean%E6%B5%81%E7%A8%8B%E8%A7%A3%E6%9E%90/&title=spring加载bean流程解析"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://jackiehow.github.io/2020/12/16/spring%E5%8A%A0%E8%BD%BDbean%E6%B5%81%E7%A8%8B%E8%A7%A3%E6%9E%90/&is_video=false&description=spring加载bean流程解析"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=spring加载bean流程解析&body=Check out this article: https://jackiehow.github.io/2020/12/16/spring%E5%8A%A0%E8%BD%BDbean%E6%B5%81%E7%A8%8B%E8%A7%A3%E6%9E%90/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://jackiehow.github.io/2020/12/16/spring%E5%8A%A0%E8%BD%BDbean%E6%B5%81%E7%A8%8B%E8%A7%A3%E6%9E%90/&title=spring加载bean流程解析"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://jackiehow.github.io/2020/12/16/spring%E5%8A%A0%E8%BD%BDbean%E6%B5%81%E7%A8%8B%E8%A7%A3%E6%9E%90/&title=spring加载bean流程解析"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://jackiehow.github.io/2020/12/16/spring%E5%8A%A0%E8%BD%BDbean%E6%B5%81%E7%A8%8B%E8%A7%A3%E6%9E%90/&title=spring加载bean流程解析"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://jackiehow.github.io/2020/12/16/spring%E5%8A%A0%E8%BD%BDbean%E6%B5%81%E7%A8%8B%E8%A7%A3%E6%9E%90/&title=spring加载bean流程解析"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://jackiehow.github.io/2020/12/16/spring%E5%8A%A0%E8%BD%BDbean%E6%B5%81%E7%A8%8B%E8%A7%A3%E6%9E%90/&name=spring加载bean流程解析&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://jackiehow.github.io/2020/12/16/spring%E5%8A%A0%E8%BD%BDbean%E6%B5%81%E7%A8%8B%E8%A7%A3%E6%9E%90/&t=spring加载bean流程解析"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2024
+    Jackie
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="http://github.com/probberechts">项目</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>
